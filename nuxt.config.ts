@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: 'latest',
   css: ['~/assets/main.css'],
   app: {
-    baseURL: '/workout/',
+    baseURL: '/',
     head: {
       meta: [
         { name: 'theme-color', content: '#171e19' },
@@ -13,7 +13,7 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
       ],
       link: [
-        { rel: 'manifest', href: '/workout/manifest.webmanifest' },
+        { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'icon', type: 'image/svg+xml', href: 'icon.svg' },
         { rel: 'icon', type: 'image/svg+xml', sizes: '192x192', href: 'icon-192.svg' },
         { rel: 'icon', type: 'image/svg+xml', sizes: '512x512', href: 'icon-512.svg' },
@@ -33,7 +33,7 @@ export default defineNuxtConfig({
     injectRegister: 'auto',
     registerType: 'autoUpdate',
     manifest: {
-      id: '/workout/',
+      id: '/',
       name: 'Workout PWA',
       short_name: 'Workout',
       description: 'Track split workouts and progress day by day.',
@@ -42,8 +42,8 @@ export default defineNuxtConfig({
       theme_color: '#171e19',
       background_color: '#eeebe3',
       display: 'standalone',
-      start_url: '/workout/',
-      scope: '/workout/',
+      start_url: '/',
+      scope: '/',
       icons: [
         {
           src: 'icon-192.svg',
@@ -62,7 +62,7 @@ export default defineNuxtConfig({
     workbox: {
       cleanupOutdatedCaches: true,
       globPatterns: ['**/*.{js,css,html,png,svg,ico,txt,woff2}'],
-      navigateFallback: '/workout/',
+      navigateFallback: '/',
     },
     client: {
       installPrompt: true,
