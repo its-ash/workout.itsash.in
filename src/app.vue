@@ -5,7 +5,11 @@
       <div class="brand-left">
         <h1>Daily Split Tracker</h1>
       </div>
-      <div class="header-actions"></div>
+      <div class="header-actions">
+        <button class="secondary" @click="checkForUpdates" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+          Check Updates
+        </button>
+      </div>
     </header>
 
     <section class="workspace">
@@ -174,6 +178,7 @@ const pwa = usePWA() as unknown as {
 };
 const standaloneMode = ref(false);
 const dismissUpdateBanner = ref(false);
+const manualUpdateCheck = ref(false);
 
 const updateStandaloneMode = () => {
   if (!import.meta.client) {
@@ -211,7 +216,7 @@ const installApp = async () => {
   await pwa.install();
 };
 
-const hasPendingUpdate = computed(() => Boolean(unref(pwa?.needRefresh)));
+const hasPendingUpdate = computed(() => Boolean(unref(pwa?.needRefresh)) || manualUpdateCheck.value);
 
 const showUpdateBanner = computed(
   () =>
@@ -229,6 +234,21 @@ const applyUpdate = async () => {
   }
   if (import.meta.client) {
     window.location.reload();
+  }
+};
+
+const checkForUpdates = async () => {
+  if (!import.meta.client) {
+    return;
+  }
+  try {
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (registration) {
+      await registration.update();
+      manualUpdateCheck.value = true;
+    }
+  } catch (error) {
+    console.log("Update check error:", error);
   }
 };
 
@@ -310,6 +330,12 @@ onMounted(() => {
   updateStandaloneMode();
   window.addEventListener("appinstalled", updateStandaloneMode);
 
+  if (import.meta.client && navigator.serviceWorker) {
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      manualUpdateCheck.value = true;
+    });
+  }
+
   const raw = localStorage.getItem(STORE_KEY);
   if (!raw) {
     return;
@@ -348,6 +374,7 @@ watch(
 watch(hasPendingUpdate, (value) => {
   if (!value) {
     dismissUpdateBanner.value = false;
+    manualUpdateCheck.value = false;
   }
 });
 </script>
