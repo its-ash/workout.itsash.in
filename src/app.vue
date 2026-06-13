@@ -5,16 +5,7 @@
       <div class="brand-left">
         <h1>Daily Split Tracker</h1>
       </div>
-      <div class="header-actions">
-        <div class="badge level-picker">
-          <span>Level</span>
-          <select v-model="state.level" class="level-select">
-            <option v-for="level in levels" :key="level" :value="level">
-              {{ level }}
-            </option>
-          </select>
-        </div>
-      </div>
+      <div class="header-actions"></div>
     </header>
 
     <section class="workspace">
@@ -60,15 +51,12 @@ import { computed, onMounted, reactive, ref, unref, watch } from "vue";
 
 type SplitDay = { day: number; workout: string[] };
 type SplitProgram = { id: string; title: string; days: SplitDay[] };
-type LevelName = "Beginner" | "Intermediate" | "Advanced";
 type WorkoutState = {
-  level: LevelName;
   currentDay: number;
   completedDays: number[];
 };
 type WorkoutLine = { name: string; plan: string; note: string };
 
-const levels: LevelName[] = ["Beginner", "Intermediate", "Advanced"];
 const DAYS_PER_CYCLE = 6;
 
 const pushPullLegsSplit: SplitProgram = {
@@ -156,7 +144,6 @@ const pushPullLegsSplit: SplitProgram = {
 const STORE_KEY = "workout-pwa-v1";
 
 const state = reactive<WorkoutState>({
-  level: levels[0],
   currentDay: 1,
   completedDays: [],
 });
@@ -245,137 +232,35 @@ const applyUpdate = async () => {
   }
 };
 
-const levelProfiles: Record<
-  LevelName,
-  {
-    setDelta: number;
-    repDelta: number;
-    restDelta: number;
-    roundDelta: number;
-    holdDelta: number;
-    effort: string;
-    notes: string[];
-    fallback: string;
-  }
-> = {
-  Beginner: {
-    setDelta: -1,
-    repDelta: 2,
-    restDelta: 15,
-    roundDelta: 0,
-    holdDelta: -5,
-    effort: "RIR 2-3",
-    notes: [
-      "Prioritize technique and stable range of motion.",
-      "Keep one to three reps in reserve each set.",
-      "Rest fully so each set stays clean and repeatable.",
-    ],
-    fallback: "Use controlled tempo and stop with 2-3 reps in reserve.",
-  },
-  Intermediate: {
-    setDelta: 0,
-    repDelta: 0,
-    restDelta: 0,
-    roundDelta: 1,
-    holdDelta: 0,
-    effort: "RIR 1-2",
-    notes: [
-      "Progress load only when all reps are technically strong.",
-      "Control eccentric phase and drive explosive concentric reps.",
-      "Match effort across sets and keep execution consistent.",
-    ],
-    fallback: "Target 1-2 reps in reserve with strict, consistent form.",
-  },
-  Advanced: {
-    setDelta: 1,
-    repDelta: -1,
-    restDelta: -10,
-    roundDelta: 1,
-    holdDelta: 5,
-    effort: "RIR 0-1",
-    notes: [
-      "Push top sets close to failure while preserving mechanics.",
-      "Use full intent on every rep and track performance precisely.",
-      "Shorten rest only if output and technique stay high.",
-    ],
-    fallback: "Train close to failure with quality reps and tight execution.",
-  },
+const advancedProfile = {
+  effort: "RIR 0-1",
+  notes: [
+    "Push top sets close to failure while preserving mechanics.",
+    "Use full intent on every rep and track performance precisely.",
+    "Shorten rest only if output and technique stay high.",
+  ],
 };
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
 
-const formatWorkoutForLevel = (
+
+const formatWorkout = (
   line: string,
-  level: LevelName,
   index: number,
 ): WorkoutLine => {
-  const profile = levelProfiles[level];
-
-  const setPattern = /^(.*) - (\d+) sets x (\d+) reps(.*), rest (\d+)s$/;
-  const roundPattern = /^(.*) - (\d+) rounds x (\d+) seconds, rest (\d+)s$/;
-  const minutePattern = /^(.*) - (\d+) minutes \((.*)\)$/;
-
-  const setMatch = line.match(setPattern);
-  if (setMatch) {
-    const [, name, sets, reps, repSuffix, rest] = setMatch;
-    const nextSets = clamp(Number(sets) + profile.setDelta, 2, 6);
-    const nextReps = clamp(Number(reps) + profile.repDelta, 5, 20);
-    const nextRest = clamp(Number(rest) + profile.restDelta, 30, 180);
-
-    return {
-      name,
-      plan: `${nextSets} sets x ${nextReps} reps${repSuffix}, rest ${nextRest}s · ${profile.effort}`,
-      note: profile.notes[index % profile.notes.length],
-    };
-  }
-
-  const roundMatch = line.match(roundPattern);
-  if (roundMatch) {
-    const [, name, rounds, seconds, rest] = roundMatch;
-    const nextRounds = clamp(Number(rounds) + profile.roundDelta, 2, 6);
-    const nextSeconds = clamp(Number(seconds) + profile.holdDelta, 20, 75);
-    const nextRest = clamp(Number(rest) + profile.restDelta, 30, 120);
-
-    return {
-      name,
-      plan: `${nextRounds} rounds x ${nextSeconds} seconds, rest ${nextRest}s · ${profile.effort}`,
-      note: profile.notes[index % profile.notes.length],
-    };
-  }
-
-  const minuteMatch = line.match(minutePattern);
-  if (minuteMatch) {
-    const [, name, minutes, detail] = minuteMatch;
-    const nextMinutes = clamp(
-      Number(minutes) +
-        (level === "Advanced" ? 3 : level === "Beginner" ? -2 : 0),
-      8,
-      20,
-    );
-
-    return {
-      name,
-      plan: `${nextMinutes} minutes (${detail}) · ${profile.effort}`,
-      note: profile.notes[index % profile.notes.length],
-    };
-  }
-
   const separator = line.indexOf(" - ");
   const name = separator > -1 ? line.slice(0, separator) : line;
-  const plan = separator > -1 ? line.slice(separator + 3) : profile.fallback;
+  const plan = separator > -1 ? line.slice(separator + 3) : "";
 
   return {
     name,
-    plan: `${plan} · ${profile.effort}`,
-    note: profile.notes[index % profile.notes.length],
+    plan: `${plan} · ${advancedProfile.effort}`,
+    note: advancedProfile.notes[index % advancedProfile.notes.length],
   };
 };
 
 const detailedWorkout = computed<WorkoutLine[]>(() => {
-  const level = state.level as LevelName;
   return todayWorkout.value.map((line, index) =>
-    formatWorkoutForLevel(line, level, index),
+    formatWorkout(line, index),
   );
 });
 
@@ -431,9 +316,6 @@ onMounted(() => {
   }
   try {
     const saved = JSON.parse(raw) as Partial<WorkoutState>;
-    if (saved.level && levels.includes(saved.level)) {
-      state.level = saved.level;
-    }
     const maxDay = DAYS_PER_CYCLE;
     if (
       saved.currentDay &&
