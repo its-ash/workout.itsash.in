@@ -2,12 +2,13 @@
 <template>
   <main class="app-shell">
     <header class="topbar glass">
-      <div class="brand-left">
-        <h1>Daily Split Tracker</h1>
-      </div>
       <div class="header-actions">
-        <button class="secondary" @click="checkForUpdates" style="font-size: 0.85rem; padding: 0.4rem 0.8rem">
-          Check Updates
+        <button class="secondary" @click="showStretchingModal = true">
+          🧘
+        </button>
+        <h1>WorkOut</h1>
+        <button class="secondary right" @click="checkForUpdates">
+          🔄
         </button>
       </div>
     </header>
@@ -29,9 +30,6 @@
     </section>
 
     <div class="actions day-actions">
-      <button class="secondary" @click="showStretchingModal = true" style="font-size: 0.85rem">
-        🧘 Stretching
-      </button>
       <button v-if="canInstall" class="secondary" @click="installApp">
         Install App
       </button>
@@ -54,7 +52,9 @@
       <div class="modal-content stretching-modal">
         <div class="modal-header">
           <h2>Full Body Stretching Routine</h2>
-          <button class="close-btn" @click="showStretchingModal = false">✕</button>
+          <button class="close-btn" @click="showStretchingModal = false">
+            ✕
+          </button>
         </div>
         <div class="stretching-list">
           <div v-for="stretch in stretchingRoutine" :key="stretch.id" class="stretch-card">
@@ -67,8 +67,13 @@
           </div>
         </div>
         <div class="modal-footer">
-          <p class="stretch-tip">💡 Breathe deeply and hold each stretch. Never bounce. Relax into the stretch.</p>
-          <button class="primary" @click="showStretchingModal = false">Done</button>
+          <p class="stretch-tip">
+            💡 Breathe deeply and hold each stretch. Never bounce. Relax into
+            the stretch.
+          </p>
+          <button class="primary" @click="showStretchingModal = false">
+            Done
+          </button>
         </div>
       </div>
     </div>
@@ -212,140 +217,160 @@ const stretchingRoutine = [
     name: "Neck Rolls",
     duration: "30 seconds",
     description: "Gently rotate your head in circles",
-    instruction: "Slowly roll your head clockwise, then counterclockwise. Keep shoulders relaxed.",
+    instruction:
+      "Slowly roll your head clockwise, then counterclockwise. Keep shoulders relaxed.",
   },
   {
     id: "neck-side-stretch",
     name: "Neck Side Stretch",
     duration: "30 seconds each side",
     description: "Stretch neck and shoulder muscles",
-    instruction: "Tilt head toward shoulder. Use gentle hand pressure. Breathe deeply.",
+    instruction:
+      "Tilt head toward shoulder. Use gentle hand pressure. Breathe deeply.",
   },
   {
     id: "shoulder-rolls",
     name: "Shoulder Rolls",
     duration: "30 seconds",
     description: "Roll shoulders backward to release tension",
-    instruction: "Lift shoulders to ears, roll back and down. Repeat 10 times each direction.",
+    instruction:
+      "Lift shoulders to ears, roll back and down. Repeat 10 times each direction.",
   },
   {
     id: "shoulder-blade-squeeze",
     name: "Shoulder Blade Squeeze",
     duration: "30 seconds",
     description: "Strengthen and stretch upper back",
-    instruction: "Squeeze shoulder blades together, hold 2 seconds. Release and relax.",
+    instruction:
+      "Squeeze shoulder blades together, hold 2 seconds. Release and relax.",
   },
   {
     id: "chest-opener",
     name: "Chest Opener",
     duration: "45 seconds each side",
     description: "Open up your chest and shoulders",
-    instruction: "Clasp hands behind back, straighten arms, lift chest. Hold and breathe deeply.",
+    instruction:
+      "Clasp hands behind back, straighten arms, lift chest. Hold and breathe deeply.",
   },
   {
     id: "tricep-stretch",
     name: "Tricep Stretch",
     duration: "45 seconds each arm",
     description: "Release tension in back of arms",
-    instruction: "Reach one arm overhead, bend elbow. Gently press elbow back with other hand.",
+    instruction:
+      "Reach one arm overhead, bend elbow. Gently press elbow back with other hand.",
   },
   {
     id: "lat-stretch",
     name: "Lat Stretch",
     duration: "45 seconds each side",
     description: "Stretch sides and latissimus dorsi",
-    instruction: "Reach arm overhead and lean to opposite side. Feel stretch along side body.",
+    instruction:
+      "Reach arm overhead and lean to opposite side. Feel stretch along side body.",
   },
   {
     id: "wrist-forearm",
     name: "Wrist & Forearm Stretch",
     duration: "30 seconds each arm",
     description: "Release wrist and forearm tightness",
-    instruction: "Extend arm, press palm down with other hand. Reverse for back of forearm.",
+    instruction:
+      "Extend arm, press palm down with other hand. Reverse for back of forearm.",
   },
   {
     id: "cat-cow",
     name: "Cat-Cow Stretch",
     duration: "1 minute",
     description: "Mobilize your entire spine",
-    instruction: "On hands and knees: arch back (cow), then round spine (cat). Flow smoothly.",
+    instruction:
+      "On hands and knees: arch back (cow), then round spine (cat). Flow smoothly.",
   },
   {
     id: "child-pose",
     name: "Child's Pose",
     duration: "1 minute",
     description: "Full body relaxation and back stretch",
-    instruction: "Kneel, sit hips back to heels, extend arms forward. Rest forehead down.",
+    instruction:
+      "Kneel, sit hips back to heels, extend arms forward. Rest forehead down.",
   },
   {
     id: "cobra-stretch",
     name: "Cobra Stretch",
     duration: "45 seconds",
     description: "Open chest and stretch front of body",
-    instruction: "Lie face down, push chest up with hands, keep hips on ground. Arch gently.",
+    instruction:
+      "Lie face down, push chest up with hands, keep hips on ground. Arch gently.",
   },
   {
     id: "forward-fold",
     name: "Forward Fold",
     duration: "1 minute",
     description: "Stretch hamstrings and lower back",
-    instruction: "Bend forward from hips. Let arms hang. Relax and let gravity do the work.",
+    instruction:
+      "Bend forward from hips. Let arms hang. Relax and let gravity do the work.",
   },
   {
     id: "quad-stretch",
     name: "Quadriceps Stretch",
     duration: "45 seconds each leg",
     description: "Release tension in front thighs",
-    instruction: "Standing, pull one foot to glutes. Keep knees together. Hold each leg.",
+    instruction:
+      "Standing, pull one foot to glutes. Keep knees together. Hold each leg.",
   },
   {
     id: "hamstring",
     name: "Hamstring Stretch",
     duration: "1 minute each leg",
     description: "Loosen tight hamstrings",
-    instruction: "Extend one leg, hinge at hips. Keep back straight. Feel the stretch behind thigh.",
+    instruction:
+      "Extend one leg, hinge at hips. Keep back straight. Feel the stretch behind thigh.",
   },
   {
     id: "glute-stretch",
     name: "Glute Stretch",
     duration: "45 seconds each side",
     description: "Release glute and hip tension",
-    instruction: "Lying down, pull one knee to opposite shoulder. Hold and relax deeply.",
+    instruction:
+      "Lying down, pull one knee to opposite shoulder. Hold and relax deeply.",
   },
   {
     id: "hip-opener",
     name: "Hip Opener",
     duration: "1 minute each side",
     description: "Release hip flexors and glutes",
-    instruction: "Pigeon pose: one leg extended back, other bent forward. Sink hips down gently.",
+    instruction:
+      "Pigeon pose: one leg extended back, other bent forward. Sink hips down gently.",
   },
   {
     id: "butterfly-stretch",
     name: "Butterfly Stretch",
     duration: "1 minute",
     description: "Open inner thighs and hips",
-    instruction: "Sit, soles of feet together, knees out. Lean forward gently. Keep back straight.",
+    instruction:
+      "Sit, soles of feet together, knees out. Lean forward gently. Keep back straight.",
   },
   {
     id: "spinal-twist",
     name: "Spinal Twist",
     duration: "45 seconds each side",
     description: "Decompress spine and improve mobility",
-    instruction: "Seated or lying, cross one leg over, gently twist to opposite side.",
+    instruction:
+      "Seated or lying, cross one leg over, gently twist to opposite side.",
   },
   {
     id: "calf-stretch",
     name: "Calf Stretch",
     duration: "45 seconds each leg",
     description: "Release tight calves",
-    instruction: "Step back, heel down, lean forward. Keep leg straight. Feel stretch in calf.",
+    instruction:
+      "Step back, heel down, lean forward. Keep leg straight. Feel stretch in calf.",
   },
   {
     id: "lower-back",
     name: "Lower Back Stretch",
     duration: "1 minute",
     description: "Relieve lower back tension",
-    instruction: "Lying on back, pull both knees to chest. Hold and breathe deeply.",
+    instruction:
+      "Lying on back, pull both knees to chest. Hold and breathe deeply.",
   },
 ];
 

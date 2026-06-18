@@ -30,10 +30,9 @@ body {
 .app-shell {
   max-width: 1480px;
   margin: 0 auto;
-  padding: 1rem 1rem 6.2rem;
+  padding: 0rem 0rem 70px;
   display: grid;
   grid-template-rows: auto 1fr;
-  gap: 0.9rem;
   height: 100dvh;
   overflow: hidden;
 }
@@ -62,9 +61,10 @@ body {
 .header-actions {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.55rem;
+  width: 100%;
   margin-left: auto;
-  padding-right: 7.8rem;
 }
 
 .install-btn {
@@ -480,10 +480,6 @@ button:disabled {
 }
 
 @media (min-width: 640px) {
-  .app-shell {
-    padding: 1.15rem 1.15rem 6.5rem;
-  }
-
   .selector-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -495,10 +491,6 @@ button:disabled {
     border-width: 4px;
     box-shadow: 8px 8px 0 0 var(--fg);
     padding: 1.2rem;
-  }
-
-  .app-shell {
-    padding: 1.25rem 1.5rem 6.8rem;
   }
 
   .topbar {
@@ -582,7 +574,6 @@ button:disabled {
 
   .header-actions {
     width: 100%;
-    justify-content: flex-start;
     margin-left: 0;
     padding-right: 0;
   }
