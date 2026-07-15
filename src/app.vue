@@ -91,11 +91,11 @@ type WorkoutState = {
 };
 type WorkoutLine = { name: string; plan: string; note: string };
 
-const DAYS_PER_CYCLE = 6;
+const DAYS_PER_CYCLE = 7;
 
 const pushPullLegsSplit: SplitProgram = {
   id: "push-pull-legs",
-  title: "Push / Pull / Legs",
+  title: "Push / Pull / Legs / Arms / Cardio & Stretch",
   days: [
     {
       day: 1,
@@ -107,7 +107,8 @@ const pushPullLegsSplit: SplitProgram = {
         "Dumbbell Lateral Raise - 3 sets x 12 reps, rest 60s",
         "Skull Crusher - 3 sets x 10 reps, rest 75s",
         "Rope Triceps Pushdown - 3 sets x 12 reps, rest 60s",
-        "Machine Ab Crunch - 3 sets x 12 reps, rest 60s",
+        "Cable Crunch - 3 sets x 12 reps, rest 60s",
+        "Pallof Press - 3 sets x 12 reps each side, rest 60s",
       ],
     },
     {
@@ -119,19 +120,21 @@ const pushPullLegsSplit: SplitProgram = {
         "Lat Pulldown - 3 sets x 10 reps, rest 90s",
         "Face Pulls - 3 sets x 15 reps, rest 60s",
         "Barbell Curl - 3 sets x 8 reps, rest 75s",
-        "Machine Curl - 3 sets x 12 reps, rest 60s",
-        "Pallof Press - 3 sets x 12 reps each side, rest 60s",
+        "Incline Dumbbell Curl - 3 sets x 10 reps, rest 60s",
+        "Hanging Leg Raise - 3 sets x 12 reps, rest 60s",
+        "Suitcase Carry - 3 sets x 45 seconds each side, rest 45s",
       ],
     },
     {
       day: 3,
       workout: [
-        "Barbell Front Squat - 4 sets x 8 reps, rest 150s",
         "Barbell Hip Thrust - 4 sets x 8 reps, rest 120s",
-        "Leg Press - 3 sets x 12 reps, rest 120s",
+        "Leg Press - 4 sets x 12 reps, rest 120s",
+        "Romanian Deadlift - 3 sets x 10 reps, rest 120s",
         "Leg Curl - 3 sets x 12 reps, rest 90s",
         "Leg Extension - 3 sets x 15 reps, rest 75s",
-        "Standing Calf Raise - 3 sets x 15 reps, rest 60s",
+        "Standing Calf Raise - 5 sets x 15 reps, rest 60s",
+        "Cable Crunch - 3 sets x 15 reps, rest 60s",
         "Dragon Flag Progression - 3 sets x 6 reps, rest 90s",
       ],
     },
@@ -141,11 +144,12 @@ const pushPullLegsSplit: SplitProgram = {
         "Dumbbell Incline Press - 4 sets x 10 reps, rest 90s",
         "Machine Chest Press - 3 sets x 12 reps, rest 75s",
         "Cable Flye - 3 sets x 15 reps, rest 60s",
-        "Dumbbell Lateral Raise - 3 sets x 12 reps, rest 75s",
+        "Dumbbell Shoulder Press - 3 sets x 10 reps, rest 90s",
+        "Cable Lateral Raise - 3 sets x 15 reps, rest 60s",
         "Reverse Pec Deck - 3 sets x 15 reps, rest 60s",
-        "Cable Rope Triceps Pushdown - 3 sets x 12 reps, rest 60s",
+        "Overhead Cable Triceps Extension - 3 sets x 12 reps, rest 60s",
         "Dip Machine - 3 sets x 10 reps, rest 75s",
-        "Suitcase Carry - 3 sets x 45 seconds each side, rest 45s",
+        "Reverse Grip Cable Pushdown - 3 sets x 15 reps, rest 60s",
       ],
     },
     {
@@ -153,23 +157,36 @@ const pushPullLegsSplit: SplitProgram = {
       workout: [
         "Lat Pulldown - 4 sets x 10 reps, rest 90s",
         "Sealed Chest Supported Row - 4 sets x 10 reps, rest 90s",
-        "Incline Dumbbell Curl - 3 sets x 10 reps, rest 75s",
+        "Machine Row - 3 sets x 12 reps, rest 75s",
+        "Face Pulls - 3 sets x 15 reps, rest 60s",
         "Machine Curl - 3 sets x 12 reps, rest 75s",
         "Reverse Cable Curl - 3 sets x 12 reps, rest 60s",
-        "Face Pulls - 3 sets x 15 reps, rest 60s",
-        "Ab Wheel - 3 sets x 10 reps, rest 60s",
+        "Dumbbell Hammer Curl - 3 sets x 12 reps, rest 60s",
+        "Hanging Leg Raise - 3 sets x 12 reps, rest 60s",
+        "Cable Crunch - 3 sets x 15 reps, rest 60s",
       ],
     },
     {
       day: 6,
       workout: [
-        "Bulgarian Split Squat - 4 sets x 10 reps each leg, rest 90s",
-        "Leg Press - 3 sets x 12 reps, rest 90s",
-        "Leg Extension - 3 sets x 15 reps, rest 75s",
-        "Walking Lunge - 3 sets x 10 reps each leg, rest 75s",
-        "Seated Calf Raise - 4 sets x 15 reps, rest 60s",
-        "Leg Curl - 3 sets x 12 reps, rest 60s",
-        "Cable Crunch - 3 sets x 15 reps, rest 60s",
+        "Close Grip Bench Press - 4 sets x 8 reps, rest 90s",
+        "Cable Rope Triceps Pushdown - 3 sets x 12 reps, rest 60s",
+        "Overhead Dumbbell Extension - 3 sets x 12 reps, rest 60s",
+        "Reverse Grip Cable Pushdown - 3 sets x 15 reps, rest 60s",
+        "Barbell Curl - 4 sets x 8 reps, rest 75s",
+        "Incline Dumbbell Curl - 3 sets x 10 reps, rest 60s",
+        "Cable Rope Hammer Curl - 3 sets x 12 reps, rest 60s",
+        "Concentration Curl - 3 sets x 12 reps each side, rest 60s",
+        "Hanging Leg Raise - 3 sets x 12 reps, rest 60s",
+      ],
+    },
+    {
+      day: 7,
+      workout: [
+        "Incline Treadmill Walk - 30 minutes, moderate pace",
+        "Stationary Bike - 20 minutes, moderate intensity",
+        "Full Body Stretching Routine - 10 minutes",
+        "Foam Rolling - 5 minutes",
       ],
     },
   ],
