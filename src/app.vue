@@ -100,9 +100,9 @@ const pushPullLegsSplit: SplitProgram = {
     {
       day: 1,
       workout: [
-        "Smith Machine Incline Press - 4 sets x 8 reps, rest 120s",
+        "Incline Dumbbell Press - 4 sets x 10 reps, rest 90s",
+        "Cable Crossover - 3 sets x 12 reps, rest 75s",
         "Dumbbell Bench Press - 3 sets x 10 reps, rest 90s",
-        "Incline Cable Flye - 3 sets x 12 reps, rest 60s",
         "Standing Overhead Press - 3 sets x 8 reps, rest 120s",
         "Dumbbell Lateral Raise - 3 sets x 12 reps, rest 60s",
         "Skull Crusher - 3 sets x 10 reps, rest 75s",
@@ -115,8 +115,7 @@ const pushPullLegsSplit: SplitProgram = {
       day: 2,
       workout: [
         "Assisted Chin-up Machine - 4 sets x 8 reps, rest 120s",
-        "Barbell Pendlay Row - 4 sets x 8 reps, rest 120s",
-        "Machine Row - 3 sets x 12 reps, rest 90s",
+        "Barbell Pendlay Row - 4 sets x 10 reps, rest 90s",
         "Lat Pulldown - 3 sets x 10 reps, rest 90s",
         "Face Pulls - 3 sets x 15 reps, rest 60s",
         "Barbell Curl - 3 sets x 8 reps, rest 75s",
@@ -128,12 +127,12 @@ const pushPullLegsSplit: SplitProgram = {
     {
       day: 3,
       workout: [
-        "Barbell Hip Thrust - 4 sets x 8 reps, rest 120s",
-        "Leg Press - 4 sets x 12 reps, rest 120s",
-        "Romanian Deadlift - 3 sets x 10 reps, rest 120s",
-        "Leg Curl - 3 sets x 12 reps, rest 90s",
-        "Leg Extension - 3 sets x 15 reps, rest 75s",
-        "Standing Calf Raise - 5 sets x 15 reps, rest 60s",
+        "Glute Bridge - 4 sets x 12 reps, rest 90s",
+        "Walking Lunge - 3 sets x 10 reps each leg, rest 90s",
+        "Leg Press - 4 sets x 12 reps, rest 90s",
+        "Romanian Deadlift - 3 sets x 12 reps, rest 90s",
+        "Leg Curl - 3 sets x 15 reps, rest 60s",
+        "Standing Calf Raise - 4 sets x 15 reps, rest 60s",
         "Cable Crunch - 3 sets x 15 reps, rest 60s",
         "Dragon Flag Progression - 3 sets x 6 reps, rest 90s",
       ],
@@ -143,8 +142,7 @@ const pushPullLegsSplit: SplitProgram = {
       workout: [
         "Dumbbell Incline Press - 4 sets x 10 reps, rest 90s",
         "Machine Chest Press - 3 sets x 12 reps, rest 75s",
-        "Cable Flye - 3 sets x 15 reps, rest 60s",
-        "Dumbbell Shoulder Press - 3 sets x 10 reps, rest 90s",
+        "Dumbbell Shoulder Press - 3 sets x 12 reps, rest 75s",
         "Cable Lateral Raise - 3 sets x 15 reps, rest 60s",
         "Reverse Pec Deck - 3 sets x 15 reps, rest 60s",
         "Overhead Cable Triceps Extension - 3 sets x 12 reps, rest 60s",
@@ -156,8 +154,7 @@ const pushPullLegsSplit: SplitProgram = {
       day: 5,
       workout: [
         "Lat Pulldown - 4 sets x 10 reps, rest 90s",
-        "Sealed Chest Supported Row - 4 sets x 10 reps, rest 90s",
-        "Machine Row - 3 sets x 12 reps, rest 75s",
+        "Sealed Chest Supported Row - 4 sets x 12 reps, rest 75s",
         "Face Pulls - 3 sets x 15 reps, rest 60s",
         "Machine Curl - 3 sets x 12 reps, rest 75s",
         "Reverse Cable Curl - 3 sets x 12 reps, rest 60s",
@@ -170,10 +167,9 @@ const pushPullLegsSplit: SplitProgram = {
       day: 6,
       workout: [
         "Close Grip Bench Press - 4 sets x 8 reps, rest 90s",
-        "Cable Rope Triceps Pushdown - 3 sets x 12 reps, rest 60s",
         "Overhead Dumbbell Extension - 3 sets x 12 reps, rest 60s",
         "Reverse Grip Cable Pushdown - 3 sets x 15 reps, rest 60s",
-        "Barbell Curl - 4 sets x 8 reps, rest 75s",
+        "Barbell Curl - 4 sets x 10 reps, rest 75s",
         "Incline Dumbbell Curl - 3 sets x 10 reps, rest 60s",
         "Cable Rope Hammer Curl - 3 sets x 12 reps, rest 60s",
         "Concentration Curl - 3 sets x 12 reps each side, rest 60s",
