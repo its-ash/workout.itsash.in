@@ -17,12 +17,14 @@
       <div class="content-stack">
         <section class="day-card">
           <ul class="workouts">
-            <li v-for="item in detailedWorkout" :key="item.name + item.plan">
+            <li v-for="item in detailedWorkout" :key="item.name + item.plan"
+              :class="{ clickable: item.name === runWalkName }"
+              @click="item.name === runWalkName && (showRunTimerModal = true)">
               <p class="workout-name">
                 {{ item.name }}
+                <span v-if="item.name === runWalkName" class="timer-hint">⏱️ Tap for pace guide</span>
               </p>
               <p class="workout-plan">{{ item.plan }}</p>
-              <p class="workout-note">{{ item.note }}</p>
             </li>
           </ul>
         </section>
@@ -62,16 +64,66 @@
               <h3>{{ stretch.name }}</h3>
               <p class="stretch-duration">⏱️ {{ stretch.duration }}</p>
               <p class="stretch-description">{{ stretch.description }}</p>
-              <p class="stretch-instruction">{{ stretch.instruction }}</p>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <p class="stretch-tip">
-            💡 Breathe deeply and hold each stretch. Never bounce. Relax into
-            the stretch.
-          </p>
           <button class="primary" @click="showStretchingModal = false">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Run/Walk Timer Modal -->
+    <div v-if="showRunTimerModal" class="modal-overlay" @click.self="closeRunTimer">
+      <div class="modal-content run-timer-modal">
+        <div class="modal-header">
+          <h2>Run/Walk Interval Timer</h2>
+          <button class="close-btn" @click="closeRunTimer">
+            ✕
+          </button>
+        </div>
+
+        <div class="run-timer-body">
+          <div class="run-timer-display">
+            <p class="run-timer-clock">{{ runTimerClockLabel }}</p>
+            <p class="run-timer-segment-name">{{ currentSegment.label }}</p>
+            <div class="run-timer-stats">
+              <div class="run-stat">
+                <span class="run-stat-label">Speed</span>
+                <span class="run-stat-value">{{ currentSegment.speed }}</span>
+              </div>
+              <div class="run-stat">
+                <span class="run-stat-label">Incline</span>
+                <span class="run-stat-value">{{ currentSegment.incline }}</span>
+              </div>
+            </div>
+            <p class="run-timer-next" v-if="nextSegment">
+              Next: {{ nextSegment.label }} · {{ nextSegment.speed }} · {{ nextSegment.incline }}
+            </p>
+          </div>
+
+          <div class="run-timer-controls">
+            <button class="primary" @click="toggleRunTimer">
+              {{ isRunTimerActive ? "Pause" : (runTimerElapsed > 0 ? "Resume" : "Start") }}
+            </button>
+            <button class="secondary" @click="resetRunTimer">
+              Reset
+            </button>
+          </div>
+
+          <ul class="run-segment-list">
+            <li v-for="(seg, i) in runIntervalPlan" :key="seg.label + i" :class="{ active: i === currentSegmentIndex }">
+              <span class="run-segment-time">{{ seg.durationLabel }}</span>
+              <span class="run-segment-label">{{ seg.label }}</span>
+              <span class="run-segment-detail">{{ seg.speed }} · {{ seg.incline }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-footer">
+          <button class="primary" @click="closeRunTimer">
             Done
           </button>
         </div>
@@ -81,7 +133,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, unref, watch } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref, unref, watch } from "vue";
 
 type SplitDay = { day: number; workout: string[] };
 type SplitProgram = { id: string; title: string; days: SplitDay[] };
@@ -117,6 +169,7 @@ const pushPullLegsSplit: SplitProgram = {
         "Assisted Chin-up Machine - 4 sets x 8 reps, rest 120s",
         "Barbell Pendlay Row - 4 sets x 10 reps, rest 90s",
         "Lat Pulldown - 3 sets x 10 reps, rest 90s",
+        "Barbell Shrug - 4 sets x 12 reps, rest 75s",
         "Face Pulls - 3 sets x 15 reps, rest 60s",
         "Barbell Curl - 3 sets x 8 reps, rest 75s",
         "Incline Dumbbell Curl - 3 sets x 10 reps, rest 60s",
@@ -131,6 +184,7 @@ const pushPullLegsSplit: SplitProgram = {
         "Walking Lunge - 3 sets x 10 reps each leg, rest 90s",
         "Leg Press - 4 sets x 12 reps, rest 90s",
         "Romanian Deadlift - 3 sets x 12 reps, rest 90s",
+        "Leg Extension - 3 sets x 15 reps, rest 60s",
         "Leg Curl - 3 sets x 15 reps, rest 60s",
         "Standing Calf Raise - 4 sets x 15 reps, rest 60s",
         "Cable Crunch - 3 sets x 15 reps, rest 60s",
@@ -179,7 +233,7 @@ const pushPullLegsSplit: SplitProgram = {
     {
       day: 7,
       workout: [
-        "Incline Treadmill Walk - 30 minutes, moderate pace",
+        "Run/Walk Interval Protocol - 10 minutes, tap timer for pace guide",
         "Stationary Bike - 20 minutes, moderate intensity",
         "Full Body Stretching Routine - 10 minutes",
         "Foam Rolling - 5 minutes",
@@ -223,6 +277,97 @@ const standaloneMode = ref(false);
 const dismissUpdateBanner = ref(false);
 const manualUpdateCheck = ref(false);
 const showStretchingModal = ref(false);
+const runWalkName = "Run/Walk Interval Protocol";
+
+type RunSegment = {
+  label: string;
+  speed: string;
+  incline: string;
+  seconds: number;
+  durationLabel: string;
+};
+
+const runIntervalPlan: RunSegment[] = [
+  { label: "Warm-Up Walk", speed: "3.5 mph", incline: "2%", seconds: 120, durationLabel: "0:00-2:00" },
+  { label: "Run Interval 1", speed: "6.0 mph", incline: "1%", seconds: 60, durationLabel: "2:00-3:00" },
+  { label: "Recovery Walk", speed: "3.5 mph", incline: "4%", seconds: 90, durationLabel: "3:00-4:30" },
+  { label: "Run Interval 2", speed: "6.5 mph", incline: "1%", seconds: 60, durationLabel: "4:30-5:30" },
+  { label: "Recovery Walk", speed: "3.5 mph", incline: "4%", seconds: 90, durationLabel: "5:30-7:00" },
+  { label: "Run Interval 3", speed: "7.0 mph", incline: "1%", seconds: 60, durationLabel: "7:00-8:00" },
+  { label: "Cool-Down Walk", speed: "3.0 mph", incline: "2%", seconds: 120, durationLabel: "8:00-10:00" },
+];
+
+const runIntervalTotalSeconds = runIntervalPlan.reduce(
+  (sum, seg) => sum + seg.seconds,
+  0,
+);
+
+const showRunTimerModal = ref(false);
+const isRunTimerActive = ref(false);
+const runTimerElapsed = ref(0);
+let runTimerHandle: ReturnType<typeof setInterval> | null = null;
+
+const currentSegmentIndex = computed(() => {
+  let acc = 0;
+  for (let i = 0; i < runIntervalPlan.length; i += 1) {
+    acc += runIntervalPlan[i].seconds;
+    if (runTimerElapsed.value < acc) {
+      return i;
+    }
+  }
+  return runIntervalPlan.length - 1;
+});
+
+const currentSegment = computed(() => runIntervalPlan[currentSegmentIndex.value]);
+const nextSegment = computed(
+  () => runIntervalPlan[currentSegmentIndex.value + 1] || null,
+);
+
+const runTimerClockLabel = computed(() => {
+  const remaining = Math.max(runIntervalTotalSeconds - runTimerElapsed.value, 0);
+  const mins = Math.floor(remaining / 60);
+  const secs = remaining % 60;
+  return `${mins}:${String(secs).padStart(2, "0")}`;
+});
+
+const stopRunTimerInterval = () => {
+  if (runTimerHandle !== null) {
+    clearInterval(runTimerHandle);
+    runTimerHandle = null;
+  }
+};
+
+const toggleRunTimer = () => {
+  if (isRunTimerActive.value) {
+    isRunTimerActive.value = false;
+    stopRunTimerInterval();
+    return;
+  }
+  if (runTimerElapsed.value >= runIntervalTotalSeconds) {
+    runTimerElapsed.value = 0;
+  }
+  isRunTimerActive.value = true;
+  runTimerHandle = setInterval(() => {
+    if (runTimerElapsed.value >= runIntervalTotalSeconds) {
+      isRunTimerActive.value = false;
+      stopRunTimerInterval();
+      return;
+    }
+    runTimerElapsed.value += 1;
+  }, 1000);
+};
+
+const resetRunTimer = () => {
+  isRunTimerActive.value = false;
+  stopRunTimerInterval();
+  runTimerElapsed.value = 0;
+};
+
+const closeRunTimer = () => {
+  showRunTimerModal.value = false;
+  isRunTimerActive.value = false;
+  stopRunTimerInterval();
+};
 
 const stretchingRoutine = [
   {
@@ -561,6 +706,10 @@ onMounted(() => {
   } catch {
     localStorage.removeItem(STORE_KEY);
   }
+});
+
+onUnmounted(() => {
+  stopRunTimerInterval();
 });
 
 watch(

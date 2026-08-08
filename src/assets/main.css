@@ -329,9 +329,32 @@ select {
   box-shadow: 3px 3px 0 0 var(--fg);
 }
 
+.workouts li.clickable {
+  cursor: pointer;
+  background: #fff8e0;
+}
+
+.workouts li.clickable:hover {
+  transform: translateY(-2px);
+}
+
+.workouts li.clickable:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.timer-hint {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: var(--blue);
+}
+
 .workout-name,
-.workout-plan,
-.workout-note {
+.workout-plan {
   margin: 0;
 }
 
@@ -347,17 +370,6 @@ select {
   font-size: 0.9rem;
   line-height: 1.35;
   font-weight: 500;
-}
-
-.workout-note {
-  margin-top: 0.34rem;
-  border-top: 2px solid rgba(18, 18, 18, 0.25);
-  padding-top: 0.34rem;
-  font-size: 0.75rem;
-  line-height: 1.3;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #383838;
 }
 
 .actions {
@@ -606,7 +618,6 @@ button:disabled {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  padding: 1rem;
   overflow-y: auto;
 }
 
@@ -617,10 +628,21 @@ button:disabled {
   border-radius: 0;
   max-width: 650px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 100vh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+}
+
+.run-timer-modal {
+  position: fixed;
+  inset: 0;
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100%;
+  border-width: 0;
+  box-shadow: none;
 }
 
 .modal-header {
@@ -726,13 +748,6 @@ button:disabled {
   color: #383838;
 }
 
-.stretch-instruction {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  color: #555;
-  font-style: italic;
-}
 
 .modal-footer {
   padding: 1rem;
@@ -767,7 +782,7 @@ button:disabled {
   .modal-content {
     border-width: 2px;
     box-shadow: 2px 2px 0 0 var(--fg);
-    max-height: 85vh;
+    max-height: 100vh;
   }
 
   .stretch-card {
@@ -806,4 +821,126 @@ button:disabled {
     border-width: 2px;
     box-shadow: 3px 3px 0 0 var(--fg);
   }
+}
+
+/* Run/Walk Timer Modal */
+.run-timer-body {
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.run-timer-display {
+  border: 2px solid var(--fg);
+  background: var(--blue);
+  color: var(--white);
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 3px 3px 0 0 var(--fg);
+}
+
+.run-timer-clock {
+  margin: 0;
+  font-size: clamp(2.4rem, 12vw, 3.4rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-timer-segment-name {
+  margin: 0.4rem 0 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.run-timer-stats {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.run-stat {
+  border: 2px solid var(--fg);
+  background: var(--white);
+  color: var(--fg);
+  padding: 0.5rem 0.9rem;
+  min-width: 100px;
+}
+
+.run-stat-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: #555;
+}
+
+.run-stat-value {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-top: 0.15rem;
+}
+
+.run-timer-next {
+  margin: 0.7rem 0 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.run-timer-controls {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.run-timer-controls button {
+  flex: 1;
+}
+
+.run-segment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.run-segment-list li {
+  border: 2px solid var(--fg);
+  background: #fafafa;
+  padding: 0.5rem 0.65rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.78rem;
+}
+
+.run-segment-list li.active {
+  background: var(--yellow);
+  box-shadow: 3px 3px 0 0 var(--fg);
+}
+
+.run-segment-time {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.run-segment-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.run-segment-detail {
+  font-size: 0.72rem;
+  color: #444;
+  text-align: right;
 }
