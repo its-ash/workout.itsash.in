@@ -67,70 +67,6 @@ body {
   margin-left: auto;
 }
 
-.install-btn {
-  background: var(--blue);
-  color: var(--white);
-  border: 2px solid var(--fg);
-  box-shadow: 3px 3px 0 0 var(--fg);
-  padding: 0.48rem 0.72rem;
-  font-size: 0.72rem;
-  line-height: 1;
-}
-
-.install-top-right {
-  position: absolute;
-  top: 0.7rem;
-  right: 0.8rem;
-}
-
-.brand-left {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.geo-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.geo-logo .dot,
-.geo-logo .square,
-.geo-logo .tri {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--fg);
-}
-
-.geo-logo .dot {
-  border-radius: 9999px;
-  background: var(--yellow);
-}
-
-.geo-logo .square {
-  background: var(--blue);
-}
-
-.geo-logo .tri {
-  width: 0;
-  height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-bottom: 20px solid var(--white);
-  border-top: 0;
-  border-radius: 0;
-}
-
-.kicker,
-.day-tag {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.68rem;
-  font-weight: 700;
-}
-
 h1,
 h2 {
   margin: 0.2rem 0 0;
@@ -149,58 +85,11 @@ h2 {
   letter-spacing: -0.02em;
 }
 
-.badge {
-  border: 2px solid var(--fg);
-  border-radius: 9999px;
-  background: var(--yellow);
-  color: var(--fg);
-  padding: 0.5rem 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
-  box-shadow: 3px 3px 0 0 var(--fg);
-}
-
-.level-picker {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.level-picker span {
-  font-size: 0.7rem;
-}
-
-.level-select {
-  border: 2px solid var(--fg);
-  background: var(--white);
-  color: var(--fg);
-  border-radius: 9999px;
-  padding: 0.2rem 0.5rem;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .workspace {
   display: grid;
   gap: 0.9rem;
   min-height: 0;
   overflow: hidden;
-}
-
-.sidebar {
-  background: var(--yellow);
-  align-self: start;
-}
-
-.sidebar-copy {
-  margin: 0.7rem 0 0;
-  font-weight: 500;
-  max-width: 22ch;
 }
 
 .content-stack {
@@ -212,90 +101,6 @@ h2 {
   margin: 0 auto;
 }
 
-.setup-card {
-  background: var(--blue);
-  color: var(--white);
-  position: relative;
-}
-
-.setup-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(var(--white) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-.setup-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.setup-card .field span {
-  color: var(--white);
-}
-
-.shape-band {
-  margin-top: 0.9rem;
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.shape {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--fg);
-  display: inline-block;
-}
-
-.shape.red {
-  background: var(--red);
-}
-
-.shape.blue {
-  background: var(--blue);
-}
-
-.shape.yellow {
-  background: var(--yellow);
-}
-
-.shape.rot {
-  transform: rotate(45deg);
-}
-
-.selector-grid {
-  margin-top: 1rem;
-  display: grid;
-  gap: 0.7rem;
-}
-
-.field {
-  display: grid;
-  gap: 0.35rem;
-}
-
-.field span {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.7rem;
-  font-weight: 700;
-}
-
-select {
-  width: 100%;
-  background: var(--white);
-  color: var(--fg);
-  border: 2px solid var(--fg);
-  border-radius: 0;
-  padding: 0.72rem 0.8rem;
-  font: inherit;
-  font-weight: 600;
-}
-
 .day-card {
   min-height: 420px;
   background: var(--white);
@@ -304,12 +109,56 @@ select {
   overscroll-behavior: contain;
 }
 
-.day-head .meta {
-  margin: 0.5rem 0 0;
+.day-progress {
+  border: 2px solid var(--fg);
+  background: var(--yellow);
+  padding: 0.8rem;
+  box-shadow: 3px 3px 0 0 var(--fg);
+}
+
+.day-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.day-progress-label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+}
+
+.day-progress-title {
+  margin: 0;
+  font-size: 0.92rem;
   font-weight: 700;
-  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.day-progress-dots {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.day-dot {
+  flex: 1;
+  height: 8px;
+  border: 2px solid var(--fg);
+  background: var(--white);
+}
+
+.day-dot.done {
+  background: var(--red);
+}
+
+.day-dot.current {
+  background: var(--blue);
 }
 
 .workouts {
@@ -444,14 +293,6 @@ select {
   background: var(--fg);
 }
 
-.sidebar-actions {
-  margin-top: 1rem;
-}
-
-.sidebar-actions .secondary {
-  width: 100%;
-}
-
 button {
   border-radius: 0;
   border: 2px solid var(--fg);
@@ -491,12 +332,6 @@ button:disabled {
   color: var(--white);
 }
 
-@media (min-width: 640px) {
-  .selector-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
 @media (min-width: 1024px) {
   .glass,
   .day-card {
@@ -507,18 +342,6 @@ button:disabled {
 
   .topbar {
     padding: 1.1rem 1.4rem;
-  }
-
-  .install-btn {
-    border-width: 4px;
-    box-shadow: 4px 4px 0 0 var(--fg);
-    font-size: 0.78rem;
-    padding: 0.52rem 0.85rem;
-  }
-
-  .install-top-right {
-    top: 0.95rem;
-    right: 1.4rem;
   }
 
   h1 {
@@ -574,31 +397,15 @@ button:disabled {
     padding: 0.9rem 0.85rem 0.85rem;
   }
 
-  .brand-left {
-    width: 100%;
-    padding-right: 7.2rem;
-  }
-
-  .brand-left h1 {
-    font-size: clamp(1.35rem, 5vw, 2.1rem);
-    line-height: 1;
-  }
-
   .header-actions {
     width: 100%;
     margin-left: 0;
     padding-right: 0;
   }
 
-  .badge {
-    max-width: 100%;
-    white-space: normal;
-    line-height: 1.2;
-  }
-
-  .install-top-right {
-    top: 0.8rem;
-    right: 0.8rem;
+  h1 {
+    font-size: clamp(1.35rem, 5vw, 2.1rem);
+    line-height: 1;
   }
 
   .update-toast {

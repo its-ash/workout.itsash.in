@@ -3,11 +3,13 @@
   <main class="app-shell">
     <header class="topbar glass">
       <div class="header-actions">
-        <button class="secondary" @click="showStretchingModal = true">
+        <button class="secondary" aria-label="Open stretching routine" title="Stretching routine"
+          @click="showStretchingModal = true">
           🧘
         </button>
         <h1>WorkOut</h1>
-        <button class="secondary right" @click="checkForUpdates">
+        <button class="secondary right" aria-label="Check for app updates" title="Check for updates"
+          @click="checkForUpdates">
           🔄
         </button>
       </div>
@@ -16,6 +18,18 @@
     <section class="workspace">
       <div class="content-stack">
         <section class="day-card">
+          <div class="day-progress">
+            <div class="day-progress-head">
+              <p class="day-progress-label">Day {{ state.currentDay }} of {{ DAYS_PER_CYCLE }}</p>
+              <p class="day-progress-title">{{ dayTitle }}</p>
+            </div>
+            <div class="day-progress-dots">
+              <span v-for="day in DAYS_PER_CYCLE" :key="day" class="day-dot" :class="{
+                done: state.completedDays.includes(day),
+                current: day === state.currentDay,
+              }" />
+            </div>
+          </div>
           <ul class="workouts">
             <li v-for="item in detailedWorkout" :key="item.name + item.plan"
               :class="{ clickable: item.name === runWalkName }"
@@ -135,13 +149,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, unref, watch } from "vue";
 
-type SplitDay = { day: number; workout: string[] };
+type SplitDay = { day: number; title: string; workout: string[] };
 type SplitProgram = { id: string; title: string; days: SplitDay[] };
 type WorkoutState = {
   currentDay: number;
   completedDays: number[];
 };
-type WorkoutLine = { name: string; plan: string; note: string };
+type WorkoutLine = { name: string; plan: string };
 
 const DAYS_PER_CYCLE = 7;
 
@@ -151,6 +165,7 @@ const pushPullLegsSplit: SplitProgram = {
   days: [
     {
       day: 1,
+      title: "Push · Chest, Shoulders & Triceps",
       workout: [
         "Incline Dumbbell Press - 4 sets x 10 reps, rest 90s",
         "Cable Crossover - 3 sets x 12 reps, rest 75s",
@@ -165,6 +180,7 @@ const pushPullLegsSplit: SplitProgram = {
     },
     {
       day: 2,
+      title: "Pull · Back & Biceps",
       workout: [
         "Assisted Chin-up Machine - 4 sets x 8 reps, rest 120s",
         "Barbell Pendlay Row - 4 sets x 10 reps, rest 90s",
@@ -179,6 +195,7 @@ const pushPullLegsSplit: SplitProgram = {
     },
     {
       day: 3,
+      title: "Legs & Core",
       workout: [
         "Glute Bridge - 4 sets x 12 reps, rest 90s",
         "Walking Lunge - 3 sets x 10 reps each leg, rest 90s",
@@ -193,6 +210,7 @@ const pushPullLegsSplit: SplitProgram = {
     },
     {
       day: 4,
+      title: "Push · Chest & Shoulders",
       workout: [
         "Dumbbell Incline Press - 4 sets x 10 reps, rest 90s",
         "Machine Chest Press - 3 sets x 12 reps, rest 75s",
@@ -206,6 +224,7 @@ const pushPullLegsSplit: SplitProgram = {
     },
     {
       day: 5,
+      title: "Pull · Back & Biceps",
       workout: [
         "Lat Pulldown - 4 sets x 10 reps, rest 90s",
         "Sealed Chest Supported Row - 4 sets x 12 reps, rest 75s",
@@ -219,6 +238,7 @@ const pushPullLegsSplit: SplitProgram = {
     },
     {
       day: 6,
+      title: "Arms Focus · Triceps & Biceps",
       workout: [
         "Close Grip Bench Press - 4 sets x 8 reps, rest 90s",
         "Overhead Dumbbell Extension - 3 sets x 12 reps, rest 60s",
@@ -232,6 +252,7 @@ const pushPullLegsSplit: SplitProgram = {
     },
     {
       day: 7,
+      title: "Active Recovery · Cardio & Stretch",
       workout: [
         "Run/Walk Interval Protocol - 10 minutes, tap timer for pace guide",
         "Stationary Bike - 20 minutes, moderate intensity",
@@ -252,16 +273,19 @@ const state = reactive<WorkoutState>({
 const cycleDays = computed<SplitDay[]>(() => {
   const sourceDays = pushPullLegsSplit.days;
   return Array.from({ length: DAYS_PER_CYCLE }, (_, index) => {
-    const source = sourceDays[index % sourceDays.length];
+    const source = sourceDays[index % sourceDays.length] || sourceDays[0];
     return {
       day: index + 1,
+      title: source.title,
       workout: source.workout,
     };
   });
 });
-const todayWorkout = computed(
-  () => cycleDays.value.find((d) => d.day === state.currentDay)?.workout || [],
+const currentCycleDay = computed(
+  () => cycleDays.value.find((d) => d.day === state.currentDay),
 );
+const todayWorkout = computed(() => currentCycleDay.value?.workout || []);
+const dayTitle = computed(() => currentCycleDay.value?.title || "");
 const isDoneToday = computed(() =>
   state.completedDays.includes(state.currentDay),
 );
@@ -608,14 +632,9 @@ const checkForUpdates = async () => {
 
 const advancedProfile = {
   effort: "RIR 0-1",
-  notes: [
-    "Push top sets close to failure while preserving mechanics.",
-    "Use full intent on every rep and track performance precisely.",
-    "Shorten rest only if output and technique stay high.",
-  ],
 };
 
-const formatWorkout = (line: string, index: number): WorkoutLine => {
+const formatWorkout = (line: string): WorkoutLine => {
   const separator = line.indexOf(" - ");
   const name = separator > -1 ? line.slice(0, separator) : line;
   const plan = separator > -1 ? line.slice(separator + 3) : "";
@@ -623,12 +642,11 @@ const formatWorkout = (line: string, index: number): WorkoutLine => {
   return {
     name,
     plan: `${plan} · ${advancedProfile.effort}`,
-    note: advancedProfile.notes[index % advancedProfile.notes.length],
   };
 };
 
 const detailedWorkout = computed<WorkoutLine[]>(() => {
-  return todayWorkout.value.map((line, index) => formatWorkout(line, index));
+  return todayWorkout.value.map((line) => formatWorkout(line));
 });
 
 const normalizeCycleState = () => {
@@ -667,6 +685,7 @@ const completeDay = () => {
   }
   if (state.currentDay < DAYS_PER_CYCLE) {
     state.currentDay += 1;
+    normalizeCycleState();
     return;
   }
   state.currentDay = 1;
