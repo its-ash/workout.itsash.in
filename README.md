@@ -51,6 +51,14 @@ Generated output: `.output/public`
 
 ## Deploy
 
+The app is deployed to **[workout.itsash.in](https://workout.itsash.in)** via GitHub Pages.
+
 GitHub Pages workflow is configured to deploy on push to `master` via:
 
 - `.github/workflows/deploy-pages.yml`
+
+### Custom domain setup
+
+- `public/CNAME` contains `workout.itsash.in`.
+- In GitHub repo → **Settings → Pages → Custom domain**, set `workout.itsash.in` and enable **Enforce HTTPS**.
+- Add a `CNAME` DNS record pointing `workout.itsash.in` to `<github-user>.github.io`.
