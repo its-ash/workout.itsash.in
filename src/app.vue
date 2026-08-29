@@ -11,6 +11,14 @@
         >
           🧘
         </button>
+        <button
+          class="secondary"
+          aria-label="Open treadmill setup"
+          title="Treadmill setup"
+          @click="showTreadmillModal = true"
+        >
+          🏃
+        </button>
         <h1>WorkOut</h1>
       </div>
     </header>
@@ -138,11 +146,21 @@
               v-if="stretch.gif"
               class="stretch-gif-wrap"
             >
+              <div
+                v-if="!loadedGifs.has(stretch.id)"
+                class="gif-loader"
+                aria-label="Loading gif"
+              >
+                <span class="gif-spinner" />
+              </div>
               <img
                 :src="stretch.gif"
                 :alt="stretch.name"
                 class="stretch-gif"
+                :class="{ hidden: !loadedGifs.has(stretch.id) }"
                 loading="lazy"
+                @load="onGifLoad(stretch.id)"
+                @error="onGifLoad(stretch.id)"
               >
             </div>
             <div class="stretch-info">
@@ -184,11 +202,21 @@
           </button>
         </div>
         <div class="gif-body">
+          <div
+            v-if="activeGif?.gif && !activeGifLoaded"
+            class="gif-loader gif-loader-lg"
+            aria-label="Loading gif"
+          >
+            <span class="gif-spinner" />
+          </div>
           <img
             v-if="activeGif?.gif"
             :src="activeGif.gif"
             :alt="activeGif.name"
             class="gif-image"
+            :class="{ hidden: !activeGifLoaded }"
+            @load="activeGifLoaded = true"
+            @error="activeGifLoaded = true"
           >
           <p
             v-if="activeGif?.plan"
@@ -324,6 +352,101 @@
           <button
             class="primary"
             @click="closeRunTimer"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Treadmill Setup Modal -->
+    <div
+      v-if="showTreadmillModal"
+      class="modal-overlay"
+      @click.self="closeTreadmill"
+    >
+      <div class="modal-content treadmill-modal run-timer-modal">
+        <div class="modal-header">
+          <h2>Treadmill Setup</h2>
+          <button
+            class="close-btn"
+            @click="closeTreadmill"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="treadmill-fixed">
+          <div class="run-timer-display">
+            <p class="run-timer-clock">
+              {{ treadmillClockLabel }}
+            </p>
+            <p class="run-timer-segment-name">
+              {{ currentTreadmillSegment.label }}
+            </p>
+            <div class="run-timer-stats">
+              <div class="run-stat">
+                <span class="run-stat-label">Speed</span>
+                <span class="run-stat-value run-stat-value-lg">{{ currentTreadmillSegment.speed }}</span>
+              </div>
+              <div class="run-stat">
+                <span class="run-stat-label">Incline</span>
+                <span class="run-stat-value run-stat-value-lg">{{ currentTreadmillSegment.incline }}</span>
+              </div>
+            </div>
+            <div class="treadmill-upcoming">
+              <div
+                v-if="nextTreadmillSegment"
+                class="treadmill-next-card"
+              >
+                <span class="treadmill-next-label">Next</span>
+                <span class="treadmill-next-name">{{ nextTreadmillSegment.label }}</span>
+                <span class="treadmill-next-detail">{{ nextTreadmillSegment.speed }} · {{ nextTreadmillSegment.incline }}</span>
+              </div>
+              <div
+                v-if="nextNextTreadmillSegment"
+                class="treadmill-next-card treadmill-next-card-2"
+              >
+                <span class="treadmill-next-label">Then</span>
+                <span class="treadmill-next-name">{{ nextNextTreadmillSegment.label }}</span>
+                <span class="treadmill-next-time">{{ nextNextTreadmillSegment.durationLabel }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="run-timer-controls">
+            <button
+              class="primary"
+              @click="toggleTreadmill"
+            >
+              {{ isTreadmillActive ? "Pause" : (treadmillElapsed > 0 ? "Resume" : "Start") }}
+            </button>
+            <button
+              class="secondary"
+              @click="resetTreadmill"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <div class="treadmill-scroll">
+          <ul class="run-segment-list">
+            <li
+              v-for="(seg, i) in treadmillPlan"
+              :key="seg.label + i"
+              :class="{ active: i === currentTreadmillSegmentIndex }"
+            >
+              <span class="run-segment-time">{{ seg.durationLabel }}</span>
+              <span class="run-segment-label">{{ seg.label }}</span>
+              <span class="run-segment-detail">{{ seg.speed }} · {{ seg.incline }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            class="primary"
+            @click="closeTreadmill"
           >
             Done
           </button>
@@ -836,15 +959,120 @@ const detailedWorkout = computed<WorkoutLine[]>(() => {
 
 const showGifModal = ref(false)
 const activeGif = ref<WorkoutLine | null>(null)
+const activeGifLoaded = ref(false)
+const loadedGifs = ref<Set<string>>(new Set())
+const onGifLoad = (id: string) => {
+  loadedGifs.value = new Set(loadedGifs.value).add(id)
+}
+
+const showTreadmillModal = ref(false)
+const isTreadmillActive = ref(false)
+const treadmillElapsed = ref(0)
+let treadmillHandle: ReturnType<typeof setInterval> | null = null
+
+const treadmillPlan: RunSegment[] = [
+  { label: 'Warm-Up Walk', speed: '3.0 mph', incline: '1%', seconds: 300, durationLabel: '0:00-5:00' },
+  { label: 'Sprint 1', speed: '8.5 mph', incline: '1%', seconds: 20, durationLabel: '5:00-5:20' },
+  { label: 'Rest 1', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '5:20-5:30' },
+  { label: 'Sprint 2', speed: '9.0 mph', incline: '1%', seconds: 20, durationLabel: '5:30-5:50' },
+  { label: 'Rest 2', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '5:50-6:00' },
+  { label: 'Sprint 3', speed: '9.0 mph', incline: '1%', seconds: 20, durationLabel: '6:00-6:20' },
+  { label: 'Rest 3', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '6:20-6:30' },
+  { label: 'Sprint 4', speed: '9.5 mph', incline: '1%', seconds: 20, durationLabel: '6:30-6:50' },
+  { label: 'Rest 4', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '6:50-7:00' },
+  { label: 'Sprint 5', speed: '9.5 mph', incline: '1%', seconds: 20, durationLabel: '7:00-7:20' },
+  { label: 'Rest 5', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '7:20-7:30' },
+  { label: 'Sprint 6', speed: '10.0 mph', incline: '1%', seconds: 20, durationLabel: '7:30-7:50' },
+  { label: 'Rest 6', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '7:50-8:00' },
+  { label: 'Sprint 7', speed: '10.0 mph', incline: '1%', seconds: 20, durationLabel: '8:00-8:20' },
+  { label: 'Rest 7', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '8:20-8:30' },
+  { label: 'Sprint 8', speed: '10.5 mph', incline: '1%', seconds: 20, durationLabel: '8:30-8:50' },
+  { label: 'Rest 8', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '8:50-9:00' },
+  { label: 'Cool-Down Walk', speed: '3.0 mph', incline: '1%', seconds: 180, durationLabel: '9:00-12:00' },
+]
+
+const treadmillTotalSeconds = treadmillPlan.reduce(
+  (sum, seg) => sum + seg.seconds,
+  0,
+)
+
+const currentTreadmillSegmentIndex = computed(() => {
+  let acc = 0
+  for (let i = 0; i < treadmillPlan.length; i += 1) {
+    acc += treadmillPlan[i]!.seconds
+    if (treadmillElapsed.value < acc) {
+      return i
+    }
+  }
+  return treadmillPlan.length - 1
+})
+
+const currentTreadmillSegment = computed(
+  () => treadmillPlan[currentTreadmillSegmentIndex.value]!,
+)
+const nextTreadmillSegment = computed(
+  () => treadmillPlan[currentTreadmillSegmentIndex.value + 1] || null,
+)
+const nextNextTreadmillSegment = computed(
+  () => treadmillPlan[currentTreadmillSegmentIndex.value + 2] || null,
+)
+
+const treadmillClockLabel = computed(() => {
+  const remaining = Math.max(treadmillTotalSeconds - treadmillElapsed.value, 0)
+  const mins = Math.floor(remaining / 60)
+  const secs = remaining % 60
+  return `${mins}:${String(secs).padStart(2, '0')}`
+})
+
+const stopTreadmillInterval = () => {
+  if (treadmillHandle !== null) {
+    clearInterval(treadmillHandle)
+    treadmillHandle = null
+  }
+}
+
+const toggleTreadmill = () => {
+  if (isTreadmillActive.value) {
+    isTreadmillActive.value = false
+    stopTreadmillInterval()
+    return
+  }
+  if (treadmillElapsed.value >= treadmillTotalSeconds) {
+    treadmillElapsed.value = 0
+  }
+  isTreadmillActive.value = true
+  treadmillHandle = setInterval(() => {
+    if (treadmillElapsed.value >= treadmillTotalSeconds) {
+      isTreadmillActive.value = false
+      stopTreadmillInterval()
+      return
+    }
+    treadmillElapsed.value += 1
+  }, 1000)
+}
+
+const resetTreadmill = () => {
+  isTreadmillActive.value = false
+  stopTreadmillInterval()
+  treadmillElapsed.value = 0
+}
+
+const closeTreadmill = () => {
+  showTreadmillModal.value = false
+  isTreadmillActive.value = false
+  stopTreadmillInterval()
+}
 
 const openGifModal = (item: WorkoutLine) => {
   activeGif.value = item
+  activeGifLoaded.value = false
   showGifModal.value = true
 }
 
 const closeGifModal = () => {
   showGifModal.value = false
   activeGif.value = null
+  activeGifLoaded.value = false
 }
 
 onMounted(() => {
@@ -884,6 +1112,7 @@ onMounted(() => {
 onUnmounted(() => {
   stopRunTimerInterval()
   stopSessionInterval()
+  stopTreadmillInterval()
 })
 
 watch(
