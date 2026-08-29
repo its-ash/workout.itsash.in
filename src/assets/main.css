@@ -109,6 +109,41 @@ h2 {
   overscroll-behavior: contain;
 }
 
+.session-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.session-type-btn {
+  flex: 1;
+  padding: 0.65rem 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--fg);
+  box-shadow: 3px 3px 0 0 var(--fg);
+  background: var(--white);
+  color: var(--fg);
+  cursor: pointer;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background 0.15s;
+}
+
+.session-type-btn:hover {
+  transform: translateY(-2px);
+}
+
+.session-type-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.session-type-btn.active {
+  background: var(--fg);
+  color: var(--white);
+}
+
 .day-progress {
   border: 2px solid var(--fg);
   background: var(--yellow);
@@ -118,10 +153,25 @@ h2 {
 
 .day-progress-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.6rem;
+}
+
+.day-progress-info {
+  flex: 1;
+  text-align: center;
+}
+
+.day-nav-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .day-progress-label {
@@ -181,6 +231,28 @@ h2 {
 .workouts li.clickable {
   cursor: pointer;
   background: #fff8e0;
+}
+
+.workout-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.workout-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.workout-view-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .workouts li.clickable:hover {
@@ -249,36 +321,30 @@ h2 {
   pointer-events: auto;
 }
 
-.update-toast {
-  position: fixed;
-  left: 1rem;
-  right: 1rem;
-  bottom: 5rem;
-  z-index: 50;
-  background: var(--yellow);
-  color: var(--fg);
-  border: 2px solid var(--fg);
-  box-shadow: 4px 4px 0 0 var(--fg);
-  padding: 0.7rem;
+.session-timer-body {
+  padding: 1.2rem;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
-.update-copy {
+.session-timer-summary {
   margin: 0;
-  font-size: 0.86rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
-.update-actions {
-  display: flex;
-  gap: 0.5rem;
+.session-timer-text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: #383838;
 }
 
-.update-actions button {
-  flex: 1;
+.day-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 4px 4px 0 0 var(--fg);
 }
 
 .day-card::-webkit-scrollbar {
@@ -364,16 +430,6 @@ button:disabled {
     width: 320px;
   }
 
-  .update-toast {
-    left: auto;
-    right: 1.5rem;
-    bottom: 5.8rem;
-    width: 360px;
-    border-width: 4px;
-    box-shadow: 8px 8px 0 0 var(--fg);
-    padding: 0.9rem;
-  }
-
   button {
     border-width: 4px;
   }
@@ -406,10 +462,6 @@ button:disabled {
   h1 {
     font-size: clamp(1.35rem, 5vw, 2.1rem);
     line-height: 1;
-  }
-
-  .update-toast {
-    bottom: 5.2rem;
   }
 }
 
@@ -506,6 +558,22 @@ button:disabled {
   padding: 0.8rem;
   background: #fafafa;
   box-shadow: 3px 3px 0 0 var(--fg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.stretch-gif-wrap {
+  width: 100%;
+  background: var(--fg);
+  border: 2px solid var(--fg);
+  overflow: hidden;
+}
+
+.stretch-gif {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .stretch-image {
@@ -628,6 +696,34 @@ button:disabled {
     border-width: 2px;
     box-shadow: 3px 3px 0 0 var(--fg);
   }
+}
+
+/* Exercise Gif Modal */
+.gif-modal {
+  max-width: 480px;
+}
+
+.gif-body {
+  padding: 1rem;
+  display: grid;
+  gap: 0.8rem;
+  justify-items: center;
+}
+
+.gif-image {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  border: 2px solid var(--fg);
+  box-shadow: 3px 3px 0 0 var(--fg);
+}
+
+.gif-plan {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  color: #383838;
 }
 
 /* Run/Walk Timer Modal */

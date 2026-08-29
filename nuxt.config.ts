@@ -44,7 +44,7 @@ export default defineNuxtConfig({
   pwa: {
     strategies: "generateSW",
     injectRegister: "auto",
-    registerType: "autoUpdate",
+    registerType: "prompt",
     manifest: {
       id: "/",
       name: "Workout PWA",
