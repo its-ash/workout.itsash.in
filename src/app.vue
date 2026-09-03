@@ -582,14 +582,21 @@ const runIntervalTotalSeconds = runIntervalPlan.reduce(
   0,
 )
 
+const RUN_TIMER_ANCHOR_KEY = 'workout-pwa-run-timer-anchor'
+const SESSION_ANCHOR_KEY = 'workout-pwa-session-anchor'
+const TREADMILL_ANCHOR_KEY = 'workout-pwa-treadmill-anchor'
+
 const showRunTimerModal = ref(false)
 const isRunTimerActive = ref(false)
 const runTimerElapsed = ref(0)
 let runTimerHandle: ReturnType<typeof setInterval> | null = null
+let runTimerStartMs = 0
+let runTimerBaseElapsed = 0
 
 const isSessionActive = ref(false)
 const sessionElapsed = ref(0)
 let sessionHandle: ReturnType<typeof setInterval> | null = null
+let sessionStartMs = 0
 const showSessionTimerModal = ref(false)
 
 const currentSegmentIndex = computed(() => {
@@ -622,36 +629,87 @@ const stopRunTimerInterval = () => {
   }
 }
 
+const persistRunTimerAnchor = () => {
+  if (!import.meta.client) {
+    return
+  }
+  if (!isRunTimerActive.value) {
+    localStorage.removeItem(RUN_TIMER_ANCHOR_KEY)
+    return
+  }
+  localStorage.setItem(
+    RUN_TIMER_ANCHOR_KEY,
+    JSON.stringify({ startMs: runTimerStartMs, baseElapsed: runTimerBaseElapsed }),
+  )
+}
+
+const syncRunTimerElapsed = () => {
+  if (!isRunTimerActive.value) {
+    return
+  }
+  const elapsed = runTimerBaseElapsed + Math.floor((Date.now() - runTimerStartMs) / 1000)
+  if (elapsed >= runIntervalTotalSeconds) {
+    runTimerElapsed.value = runIntervalTotalSeconds
+    isRunTimerActive.value = false
+    stopRunTimerInterval()
+    persistRunTimerAnchor()
+    return
+  }
+  runTimerElapsed.value = elapsed
+}
+
 const toggleRunTimer = () => {
   if (isRunTimerActive.value) {
     isRunTimerActive.value = false
     stopRunTimerInterval()
+    persistRunTimerAnchor()
     return
   }
   if (runTimerElapsed.value >= runIntervalTotalSeconds) {
     runTimerElapsed.value = 0
   }
   isRunTimerActive.value = true
-  runTimerHandle = setInterval(() => {
-    if (runTimerElapsed.value >= runIntervalTotalSeconds) {
-      isRunTimerActive.value = false
-      stopRunTimerInterval()
-      return
-    }
-    runTimerElapsed.value += 1
-  }, 1000)
+  runTimerStartMs = Date.now()
+  runTimerBaseElapsed = runTimerElapsed.value
+  persistRunTimerAnchor()
+  runTimerHandle = setInterval(syncRunTimerElapsed, 1000)
 }
 
 const resetRunTimer = () => {
   isRunTimerActive.value = false
   stopRunTimerInterval()
   runTimerElapsed.value = 0
+  persistRunTimerAnchor()
 }
 
 const closeRunTimer = () => {
   showRunTimerModal.value = false
   isRunTimerActive.value = false
   stopRunTimerInterval()
+  persistRunTimerAnchor()
+}
+
+const restoreRunTimerAnchor = () => {
+  if (!import.meta.client) {
+    return
+  }
+  const raw = localStorage.getItem(RUN_TIMER_ANCHOR_KEY)
+  if (!raw) {
+    return
+  }
+  try {
+    const anchor = JSON.parse(raw) as { startMs: number, baseElapsed: number }
+    runTimerStartMs = anchor.startMs
+    runTimerBaseElapsed = anchor.baseElapsed
+    isRunTimerActive.value = true
+    syncRunTimerElapsed()
+    if (isRunTimerActive.value) {
+      runTimerHandle = setInterval(syncRunTimerElapsed, 1000)
+    }
+  }
+  catch {
+    localStorage.removeItem(RUN_TIMER_ANCHOR_KEY)
+  }
 }
 
 const sessionClockLabel = computed(() => {
@@ -670,15 +728,33 @@ const stopSessionInterval = () => {
   }
 }
 
+const persistSessionAnchor = () => {
+  if (!import.meta.client) {
+    return
+  }
+  if (!isSessionActive.value) {
+    localStorage.removeItem(SESSION_ANCHOR_KEY)
+    return
+  }
+  localStorage.setItem(SESSION_ANCHOR_KEY, JSON.stringify({ startMs: sessionStartMs }))
+}
+
+const syncSessionElapsed = () => {
+  if (!isSessionActive.value) {
+    return
+  }
+  sessionElapsed.value = Math.floor((Date.now() - sessionStartMs) / 1000)
+}
+
 const startSession = () => {
   if (isSessionActive.value) {
     return
   }
   isSessionActive.value = true
   sessionElapsed.value = 0
-  sessionHandle = setInterval(() => {
-    sessionElapsed.value += 1
-  }, 1000)
+  sessionStartMs = Date.now()
+  persistSessionAnchor()
+  sessionHandle = setInterval(syncSessionElapsed, 1000)
 }
 
 const requestStopSession = () => {
@@ -687,7 +763,28 @@ const requestStopSession = () => {
   }
   stopSessionInterval()
   isSessionActive.value = false
+  persistSessionAnchor()
   showSessionTimerModal.value = true
+}
+
+const restoreSessionAnchor = () => {
+  if (!import.meta.client) {
+    return
+  }
+  const raw = localStorage.getItem(SESSION_ANCHOR_KEY)
+  if (!raw) {
+    return
+  }
+  try {
+    const anchor = JSON.parse(raw) as { startMs: number }
+    sessionStartMs = anchor.startMs
+    isSessionActive.value = true
+    syncSessionElapsed()
+    sessionHandle = setInterval(syncSessionElapsed, 1000)
+  }
+  catch {
+    localStorage.removeItem(SESSION_ANCHOR_KEY)
+  }
 }
 
 const cancelStopSession = () => {
@@ -969,6 +1066,8 @@ const showTreadmillModal = ref(false)
 const isTreadmillActive = ref(false)
 const treadmillElapsed = ref(0)
 let treadmillHandle: ReturnType<typeof setInterval> | null = null
+let treadmillStartMs = 0
+let treadmillBaseElapsed = 0
 
 const treadmillPlan: RunSegment[] = [
   { label: 'Warm-Up Walk', speed: '3.0 mph', incline: '1%', seconds: 300, durationLabel: '0:00-5:00' },
@@ -1031,36 +1130,87 @@ const stopTreadmillInterval = () => {
   }
 }
 
+const persistTreadmillAnchor = () => {
+  if (!import.meta.client) {
+    return
+  }
+  if (!isTreadmillActive.value) {
+    localStorage.removeItem(TREADMILL_ANCHOR_KEY)
+    return
+  }
+  localStorage.setItem(
+    TREADMILL_ANCHOR_KEY,
+    JSON.stringify({ startMs: treadmillStartMs, baseElapsed: treadmillBaseElapsed }),
+  )
+}
+
+const syncTreadmillElapsed = () => {
+  if (!isTreadmillActive.value) {
+    return
+  }
+  const elapsed = treadmillBaseElapsed + Math.floor((Date.now() - treadmillStartMs) / 1000)
+  if (elapsed >= treadmillTotalSeconds) {
+    treadmillElapsed.value = treadmillTotalSeconds
+    isTreadmillActive.value = false
+    stopTreadmillInterval()
+    persistTreadmillAnchor()
+    return
+  }
+  treadmillElapsed.value = elapsed
+}
+
 const toggleTreadmill = () => {
   if (isTreadmillActive.value) {
     isTreadmillActive.value = false
     stopTreadmillInterval()
+    persistTreadmillAnchor()
     return
   }
   if (treadmillElapsed.value >= treadmillTotalSeconds) {
     treadmillElapsed.value = 0
   }
   isTreadmillActive.value = true
-  treadmillHandle = setInterval(() => {
-    if (treadmillElapsed.value >= treadmillTotalSeconds) {
-      isTreadmillActive.value = false
-      stopTreadmillInterval()
-      return
-    }
-    treadmillElapsed.value += 1
-  }, 1000)
+  treadmillStartMs = Date.now()
+  treadmillBaseElapsed = treadmillElapsed.value
+  persistTreadmillAnchor()
+  treadmillHandle = setInterval(syncTreadmillElapsed, 1000)
 }
 
 const resetTreadmill = () => {
   isTreadmillActive.value = false
   stopTreadmillInterval()
   treadmillElapsed.value = 0
+  persistTreadmillAnchor()
 }
 
 const closeTreadmill = () => {
   showTreadmillModal.value = false
   isTreadmillActive.value = false
   stopTreadmillInterval()
+  persistTreadmillAnchor()
+}
+
+const restoreTreadmillAnchor = () => {
+  if (!import.meta.client) {
+    return
+  }
+  const raw = localStorage.getItem(TREADMILL_ANCHOR_KEY)
+  if (!raw) {
+    return
+  }
+  try {
+    const anchor = JSON.parse(raw) as { startMs: number, baseElapsed: number }
+    treadmillStartMs = anchor.startMs
+    treadmillBaseElapsed = anchor.baseElapsed
+    isTreadmillActive.value = true
+    syncTreadmillElapsed()
+    if (isTreadmillActive.value) {
+      treadmillHandle = setInterval(syncTreadmillElapsed, 1000)
+    }
+  }
+  catch {
+    localStorage.removeItem(TREADMILL_ANCHOR_KEY)
+  }
 }
 
 const openGifModal = (item: WorkoutLine) => {
@@ -1075,9 +1225,19 @@ const closeGifModal = () => {
   activeGifLoaded.value = false
 }
 
+const handleVisibilityChange = () => {
+  if (document.visibilityState !== 'visible') {
+    return
+  }
+  syncSessionElapsed()
+  syncRunTimerElapsed()
+  syncTreadmillElapsed()
+}
+
 onMounted(() => {
   updateStandaloneMode()
   window.addEventListener('appinstalled', updateStandaloneMode)
+  document.addEventListener('visibilitychange', handleVisibilityChange)
 
   if (import.meta.client) {
     fetch('/data/exercises.json')
@@ -1087,6 +1247,10 @@ onMounted(() => {
       })
       .catch(err => console.log('Failed to load exercises:', err))
   }
+
+  restoreSessionAnchor()
+  restoreRunTimerAnchor()
+  restoreTreadmillAnchor()
 
   const raw = localStorage.getItem(STORE_KEY)
   if (!raw) {
@@ -1110,6 +1274,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
   stopRunTimerInterval()
   stopSessionInterval()
   stopTreadmillInterval()
