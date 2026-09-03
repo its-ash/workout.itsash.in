@@ -798,20 +798,13 @@ button:disabled {
 
 .run-timer-clock {
   margin: 0;
-  font-size: clamp(2.4rem, 12vw, 3.4rem);
+  font-size: clamp(2.4rem, 20vw, 5rem);
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
-.run-timer-segment-name {
-  margin: 0.4rem 0 0;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 700;
-  font-size: 0.95rem;
-}
 
 .run-timer-stats {
   margin-top: 0.8rem;
@@ -850,6 +843,38 @@ button:disabled {
   line-height: 1.1;
 }
 
+.treadmill-stats {
+  gap: 0.8rem;
+}
+
+.treadmill-stats .run-stat {
+  background: var(--yellow);
+  padding: 0.8rem 1.2rem;
+  flex: 1 1 0;
+  text-align: center;
+}
+
+.treadmill-stats .run-stat-label {
+  font-size: clamp(0.7rem, 3vw, 0.9rem);
+  font-weight: 800;
+}
+
+.treadmill-stats .run-stat-value-lg {
+  font-size: clamp(1.8rem, 9vw, 3rem);
+}
+
+.treadmill-incline-tag {
+  font-size: 0.3em;
+  font-weight: 800;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.5rem;
+  border: 2px solid var(--fg);
+  background: var(--yellow);
+  color: var(--fg);
+  letter-spacing: 0.03em;
+}
+
 .run-timer-next {
   margin: 0.7rem 0 0;
   font-size: 0.75rem;
@@ -858,12 +883,24 @@ button:disabled {
   opacity: 0.85;
 }
 
+.treadmill-progress {
+  margin-top: 0.9rem;
+  border: 2px solid var(--fg);
+  background: var(--white);
+  height: 14px;
+  overflow: hidden;
+}
+
+.treadmill-progress-fill {
+  height: 100%;
+  background: var(--yellow);
+  transition: width 0.2s linear;
+}
+
 .treadmill-upcoming {
   margin-top: 0.9rem;
-  display: flex;
+  display: grid;
   gap: 0.6rem;
-  justify-content: center;
-  flex-wrap: wrap;
 }
 
 .treadmill-next-card {
@@ -879,6 +916,67 @@ button:disabled {
 
 .treadmill-next-card-2 {
   background: var(--yellow);
+}
+
+.treadmill-next-card-lg {
+  padding: 1rem 1.2rem;
+  flex: 1 1 0;
+  min-width: 0;
+  box-shadow: 3px 3px 0 0 var(--fg);
+}
+
+.treadmill-next-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.treadmill-next-info {
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.treadmill-next-card-lg .treadmill-next-name {
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  font-weight: 900;
+  line-height: 1.05;
+}
+
+.treadmill-next-card-lg .treadmill-next-detail {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 800;
+}
+
+.treadmill-next-card-lg .treadmill-next-time {
+  font-size: clamp(1rem, 4vw, 1.3rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.treadmill-next-card-lg .treadmill-next-label {
+  font-size: clamp(0.8rem, 3vw, 1rem);
+  font-weight: 800;
+}
+
+.treadmill-next-countdown {
+  font-size: clamp(2rem, 10vw, 3.5rem);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--red);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.treadmill-next-countdown small {
+  font-size: 0.5em;
+  font-weight: 800;
+}
+
+.treadmill-next-card-2 .treadmill-next-countdown {
+  color: var(--fg);
 }
 
 .treadmill-next-label {

@@ -6,7 +6,7 @@ Nuxt 4 PWA for split workout tracking. Static site (Nitro `static` preset, prere
 ## Tech Stack
 - **Framework**: Nuxt 4 (`nuxt` v4.4.x), Vue 3.5.x
 - **Language**: TypeScript (~6.x), strict via `vue-tsc`
-- **PWA**: `@vite-pwa/nuxt` — `generateSW` strategy, `registerType: "prompt"` (no auto-update dialog)
+- **PWA**: `@vite-pwa/nuxt` — `generateSW` strategy, `registerType: "autoUpdate"` (silent auto-update, no prompt)
 - **Linting**: `@nuxt/eslint-config` (flat config, stylistic + tooling enabled) via `eslint.config.mjs`
 - **Package manager**: pnpm (see `package-lock.json` present; Makefile uses pnpm)
 - **Node**: use current LTS (create `.nvmrc` if not present)

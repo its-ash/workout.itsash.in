@@ -299,9 +299,6 @@
             <p class="run-timer-clock">
               {{ runTimerClockLabel }}
             </p>
-            <p class="run-timer-segment-name">
-              {{ currentSegment.label }}
-            </p>
             <div class="run-timer-stats">
               <div class="run-stat">
                 <span class="run-stat-label">Speed</span>
@@ -379,36 +376,55 @@
           <div class="run-timer-display">
             <p class="run-timer-clock">
               {{ treadmillClockLabel }}
+              <span class="treadmill-incline-tag">{{ currentTreadmillSegment.incline }}</span>
             </p>
-            <p class="run-timer-segment-name">
-              {{ currentTreadmillSegment.label }}
-            </p>
-            <div class="run-timer-stats">
+            <div class="run-timer-stats treadmill-stats">
               <div class="run-stat">
                 <span class="run-stat-label">Speed</span>
                 <span class="run-stat-value run-stat-value-lg">{{ currentTreadmillSegment.speed }}</span>
               </div>
-              <div class="run-stat">
-                <span class="run-stat-label">Incline</span>
-                <span class="run-stat-value run-stat-value-lg">{{ currentTreadmillSegment.incline }}</span>
-              </div>
+            </div>
+            <div
+              class="treadmill-progress"
+              :aria-label="`Segment progress ${treadmillSegmentProgress}%`"
+            >
+              <div
+                class="treadmill-progress-fill"
+                :style="{ width: `${treadmillSegmentProgress}%` }"
+              />
             </div>
             <div class="treadmill-upcoming">
               <div
                 v-if="nextTreadmillSegment"
-                class="treadmill-next-card"
+                class="treadmill-next-card treadmill-next-card-lg"
               >
-                <span class="treadmill-next-label">Next</span>
-                <span class="treadmill-next-name">{{ nextTreadmillSegment.label }}</span>
-                <span class="treadmill-next-detail">{{ nextTreadmillSegment.speed }} · {{ nextTreadmillSegment.incline }}</span>
+                <div class="treadmill-next-row">
+                  <div class="treadmill-next-info">
+                    <span class="treadmill-next-label">Next</span>
+                    <span class="treadmill-next-name treadmill-next-speed">{{ nextTreadmillSegment.speed }}</span>
+                    <span class="treadmill-next-time">{{ nextTreadmillSegment.durationLabel }}</span>
+                  </div>
+                  <span
+                    v-if="nextTreadmillCountdown !== null"
+                    class="treadmill-next-countdown"
+                  >{{ nextTreadmillCountdown }}<small>s</small></span>
+                </div>
               </div>
               <div
                 v-if="nextNextTreadmillSegment"
-                class="treadmill-next-card treadmill-next-card-2"
+                class="treadmill-next-card treadmill-next-card-2 treadmill-next-card-lg"
               >
-                <span class="treadmill-next-label">Then</span>
-                <span class="treadmill-next-name">{{ nextNextTreadmillSegment.label }}</span>
-                <span class="treadmill-next-time">{{ nextNextTreadmillSegment.durationLabel }}</span>
+                <div class="treadmill-next-row">
+                  <div class="treadmill-next-info">
+                    <span class="treadmill-next-label">Then</span>
+                    <span class="treadmill-next-name treadmill-next-speed">{{ nextNextTreadmillSegment.speed }}</span>
+                    <span class="treadmill-next-time">{{ nextNextTreadmillSegment.durationLabel }}</span>
+                  </div>
+                  <span
+                    v-if="nextNextTreadmillCountdown !== null"
+                    class="treadmill-next-countdown"
+                  >{{ nextNextTreadmillCountdown }}<small>s</small></span>
+                </div>
               </div>
             </div>
           </div>
@@ -421,6 +437,7 @@
               {{ isTreadmillActive ? "Pause" : (treadmillElapsed > 0 ? "Resume" : "Start") }}
             </button>
             <button
+              v-if="treadmillElapsed > 0"
               class="secondary"
               @click="resetTreadmill"
             >
@@ -1123,6 +1140,38 @@ const treadmillClockLabel = computed(() => {
   return `${mins}:${String(secs).padStart(2, '0')}`
 })
 
+const treadmillSegmentProgress = computed(() => {
+  let elapsedBefore = 0
+  for (let i = 0; i < currentTreadmillSegmentIndex.value; i += 1) {
+    elapsedBefore += treadmillPlan[i]!.seconds
+  }
+  const seg = currentTreadmillSegment.value
+  const within = Math.min(Math.max(treadmillElapsed.value - elapsedBefore, 0), seg.seconds)
+  return Math.round((within / seg.seconds) * 100)
+})
+
+const nextTreadmillCountdown = computed(() => {
+  if (!nextTreadmillSegment.value) {
+    return null
+  }
+  let endOfCurrent = 0
+  for (let i = 0; i <= currentTreadmillSegmentIndex.value; i += 1) {
+    endOfCurrent += treadmillPlan[i]!.seconds
+  }
+  return Math.max(endOfCurrent - treadmillElapsed.value, 0)
+})
+
+const nextNextTreadmillCountdown = computed(() => {
+  if (!nextNextTreadmillSegment.value) {
+    return null
+  }
+  let endOfNext = 0
+  for (let i = 0; i <= currentTreadmillSegmentIndex.value + 1; i += 1) {
+    endOfNext += treadmillPlan[i]!.seconds
+  }
+  return Math.max(endOfNext - treadmillElapsed.value, 0)
+})
+
 const stopTreadmillInterval = () => {
   if (treadmillHandle !== null) {
     clearInterval(treadmillHandle)
@@ -1144,6 +1193,34 @@ const persistTreadmillAnchor = () => {
   )
 }
 
+const lastTreadmillSegmentIndex = ref(0)
+
+const playBeep = (freq = 880, duration = 150) => {
+  if (!import.meta.client) {
+    return
+  }
+  try {
+    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    if (!AudioCtx) {
+      return
+    }
+    const ctx = new AudioCtx()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'square'
+    osc.frequency.value = freq
+    gain.gain.setValueAtTime(0.15, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration / 1000)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + duration / 1000)
+    osc.onended = () => ctx.close()
+  }
+  catch {
+  }
+}
+
 const syncTreadmillElapsed = () => {
   if (!isTreadmillActive.value) {
     return
@@ -1157,6 +1234,10 @@ const syncTreadmillElapsed = () => {
     return
   }
   treadmillElapsed.value = elapsed
+  if (currentTreadmillSegmentIndex.value !== lastTreadmillSegmentIndex.value) {
+    lastTreadmillSegmentIndex.value = currentTreadmillSegmentIndex.value
+    playBeep(880, 200)
+  }
 }
 
 const toggleTreadmill = () => {
@@ -1172,6 +1253,7 @@ const toggleTreadmill = () => {
   isTreadmillActive.value = true
   treadmillStartMs = Date.now()
   treadmillBaseElapsed = treadmillElapsed.value
+  lastTreadmillSegmentIndex.value = currentTreadmillSegmentIndex.value
   persistTreadmillAnchor()
   treadmillHandle = setInterval(syncTreadmillElapsed, 1000)
 }
