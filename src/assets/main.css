@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap");
 
 :root {
   --bg: #f0f0f0;
@@ -21,7 +21,7 @@ body,
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: "Outfit", sans-serif;
   background-color: var(--bg);
   color: var(--fg);
   overflow: hidden;
@@ -127,7 +127,10 @@ h2 {
   background: var(--white);
   color: var(--fg);
   cursor: pointer;
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background 0.15s;
+  transition:
+    transform 0.2s ease-out,
+    box-shadow 0.2s ease-out,
+    background 0.15s;
 }
 
 .session-type-btn:hover {
@@ -369,7 +372,9 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+  transition:
+    transform 0.2s ease-out,
+    box-shadow 0.2s ease-out;
 }
 
 button:hover {
@@ -670,7 +675,6 @@ button:disabled {
   color: #383838;
 }
 
-
 .modal-footer {
   padding: 1rem;
   border-top: 2px solid var(--fg);
@@ -758,6 +762,7 @@ button:disabled {
 }
 
 .gif-image {
+  filter: saturate(2);
   width: 100%;
   max-width: 360px;
   height: auto;
@@ -804,7 +809,6 @@ button:disabled {
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-
 
 .run-timer-stats {
   margin-top: 0.8rem;

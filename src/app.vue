@@ -493,6 +493,11 @@ const sessionTypes: { id: SessionType, label: string, icon: string }[] = [
 
 type ExerciseRecord = {
   name: string
+  body_part: string
+  target: string
+  equipment: string
+  muscle_group: string
+  secondary_muscles: string[]
   gif_url: string
 }
 
@@ -501,24 +506,179 @@ const exerciseDb = ref<ExerciseRecord[]>([])
 const normalizeName = (s: string) =>
   s.toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim()
 
-const findGifForWorkout = (workoutName: string): string | undefined => {
+const singularize = (w: string) =>
+  w.length > 4 && w.endsWith('s') && !w.endsWith('ss') ? w.slice(0, -1) : w
+
+const sessionBodyParts: Record<SessionType, Set<string>> = {
+  push: new Set(['chest', 'shoulders', 'upper arms']),
+  pull: new Set(['back', 'upper arms']),
+  legs: new Set(['upper legs', 'lower legs', 'waist']),
+}
+
+const sessionTargets: Record<SessionType, Set<string>> = {
+  push: new Set(['pectorals', 'delts', 'triceps', 'abs']),
+  pull: new Set(['lats', 'biceps', 'traps', 'upper back', 'forearms', 'abs']),
+  legs: new Set(['quads', 'hamstrings', 'glutes', 'calves', 'abs']),
+}
+
+const keywordHints: Record<string, [string, string]> = {
+  'close grip bench press': ['upper arms', 'triceps'],
+  'incline bench press': ['chest', 'pectorals'],
+  'bench press': ['chest', 'pectorals'],
+  'chest press': ['chest', 'pectorals'],
+  'chest fly': ['chest', 'pectorals'],
+  'incline fly': ['chest', 'pectorals'],
+  'cable fly': ['chest', 'pectorals'],
+  'crossover': ['chest', 'pectorals'],
+  'reverse pec deck': ['shoulders', 'delts'],
+  'pec deck': ['shoulders', 'delts'],
+  'overhead press': ['shoulders', 'delts'],
+  'shoulder press': ['shoulders', 'delts'],
+  'lateral raise': ['shoulders', 'delts'],
+  'front raise': ['shoulders', 'delts'],
+  'face pull': ['shoulders', 'delts'],
+  'reverse fly': ['shoulders', 'delts'],
+  'shrug': ['shoulders', 'traps'],
+  'hammer curl': ['upper arms', 'biceps'],
+  'preacher curl': ['upper arms', 'biceps'],
+  'concentration curl': ['upper arms', 'biceps'],
+  'curl': ['upper arms', 'biceps'],
+  'triceps extension': ['upper arms', 'triceps'],
+  'triceps pushdown': ['upper arms', 'triceps'],
+  'tricep pushdown': ['upper arms', 'triceps'],
+  'triceps': ['upper arms', 'triceps'],
+  'tricep': ['upper arms', 'triceps'],
+  'pushdown': ['upper arms', 'triceps'],
+  'skull crusher': ['upper arms', 'triceps'],
+  'overhead extension': ['upper arms', 'triceps'],
+  'extension': ['upper arms', 'triceps'],
+  'kickback': ['upper arms', 'triceps'],
+  'dip': ['upper arms', 'triceps'],
+  'pulldown': ['back', 'lats'],
+  'pull-up': ['back', 'lats'],
+  'pull up': ['back', 'lats'],
+  'chin-up': ['back', 'lats'],
+  'chin up': ['back', 'lats'],
+  'row': ['back', 'upper back'],
+  'romanian deadlift': ['upper legs', 'hamstrings'],
+  'deadlift': ['upper legs', 'glutes'],
+  'squat': ['upper legs', 'quads'],
+  'leg press': ['upper legs', 'quads'],
+  'lunge': ['upper legs', 'quads'],
+  'leg curl': ['upper legs', 'hamstrings'],
+  'leg extension': ['upper legs', 'quads'],
+  'calf raise': ['lower legs', 'calves'],
+  'calf': ['lower legs', 'calves'],
+  'crunch': ['waist', 'abs'],
+  'plank': ['waist', 'abs'],
+  'twist': ['waist', 'abs'],
+  'pallof press': ['waist', 'abs'],
+  'pallof': ['waist', 'abs'],
+  'dragon flag': ['waist', 'abs'],
+  'leg raise': ['waist', 'abs'],
+  'hip raise': ['waist', 'abs'],
+}
+
+const equipmentHints: Record<string, string[]> = {
+  'barbell': ['barbell', 'olympic barbell', 'trap bar'],
+  'dumbbell': ['dumbbell'],
+  'cable': ['cable'],
+  'ez bar': ['ez barbell'],
+  'machine': ['leverage machine', 'sled machine', 'smith machine'],
+  'band': ['band', 'resistance band'],
+  'kettlebell': ['kettlebell'],
+  'rope': ['rope'],
+}
+
+const exerciseSynonyms: Record<string, string[]> = {
+  'face pull': ['rear delt row'],
+  'face pulls': ['rear delt row'],
+  'reverse pec deck': ['lever reverse fly'],
+  'dip machine': ['lever dip'],
+  'sealed chest supported row': ['chest supported row'],
+}
+
+const gifBlacklist = new Set(['run walk interval protocol'])
+
+const sortedKwKeys = Object.keys(keywordHints).sort((a, b) => b.length - a.length)
+
+const findGifForWorkout = (workoutName: string, sessionType: SessionType): string | undefined => {
   const norm = normalizeName(workoutName)
-  const words = norm.split(' ').filter(Boolean)
+  if (gifBlacklist.has(norm)) {
+    return undefined
+  }
+  const exact = exerciseDb.value.find(ex => normalizeName(ex.name) === norm)
+  if (exact) {
+    return `/data/${exact.gif_url}`
+  }
+  let words = norm.split(' ').filter(Boolean).map(singularize)
+  if (exerciseSynonyms[norm]) {
+    words = [...words, ...exerciseSynonyms[norm].flatMap(s => normalizeName(s).split(' ').filter(Boolean).map(singularize))]
+    words = [...new Set(words)]
+  }
   if (!words.length) {
     return undefined
+  }
+  let expectedBps = new Set(sessionBodyParts[sessionType])
+  let expectedTargets = new Set(sessionTargets[sessionType])
+  let kwMatched = false
+  for (const kw of sortedKwKeys) {
+    if (norm.includes(kw)) {
+      if (!kwMatched) {
+        expectedBps = new Set()
+        expectedTargets = new Set()
+        kwMatched = true
+      }
+      expectedBps.add(keywordHints[kw]![0])
+      expectedTargets.add(keywordHints[kw]![1])
+    }
+  }
+  const preferredEquip = new Set<string>()
+  for (const [kw, equips] of Object.entries(equipmentHints)) {
+    if (norm.includes(kw)) {
+      for (const e of equips) {
+        preferredEquip.add(e)
+      }
+    }
   }
   const ranked = exerciseDb.value
     .map((ex) => {
       const exNorm = normalizeName(ex.name)
-      let score = 0
+      const exWords = exNorm.split(' ').filter(Boolean).map(singularize)
+      let nameScore = 0
       for (const w of words) {
         if (exNorm.includes(w)) {
-          score += w.length > 3 ? 2 : 1
+          nameScore += w.length > 3 ? 2 : 1
+        }
+        if (exWords.includes(w)) {
+          nameScore += w.length > 3 ? 1 : 0
         }
       }
+      if (nameScore === 0) {
+        return { ex, score: 0 }
+      }
+      let score = nameScore
+      const bpMatch = expectedBps.has(ex.body_part)
+      const tgtMatch = expectedTargets.has(ex.target)
+      if (bpMatch) {
+        score += 5
+      }
+      if (tgtMatch) {
+        score += 3
+      }
+      if (preferredEquip.has(ex.equipment) && (bpMatch || tgtMatch)) {
+        score += 4
+      }
+      for (const sm of ex.secondary_muscles) {
+        if (expectedTargets.has(sm.toLowerCase())) {
+          score += 1
+        }
+      }
+      const extraWords = Math.max(exWords.length - words.length, 0)
+      score -= extraWords * 0.5
       return { ex, score }
     })
-    .filter(r => r.score > 0)
+    .filter(r => r.score >= 6)
     .sort((a, b) => b.score - a.score)
   return ranked.length ? `/data/${ranked[0]!.ex.gif_url}` : undefined
 }
@@ -1067,7 +1227,7 @@ const formatWorkout = (line: string): WorkoutLine => {
 const detailedWorkout = computed<WorkoutLine[]>(() => {
   return todayWorkout.value.map((line) => {
     const w = formatWorkout(line)
-    return { ...w, gif: findGifForWorkout(w.name) }
+    return { ...w, gif: findGifForWorkout(w.name, state.sessionType) }
   })
 })
 
