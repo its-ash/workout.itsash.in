@@ -13,8 +13,8 @@
         </button>
         <button
           class="secondary"
-          aria-label="Open treadmill setup"
-          title="Treadmill setup"
+          aria-label="Open interval walking training"
+          title="Interval Walking Training"
           @click="showTreadmillModal = true"
         >
           🏃
@@ -363,7 +363,7 @@
     >
       <div class="modal-content treadmill-modal run-timer-modal">
         <div class="modal-header">
-          <h2>Treadmill Setup</h2>
+          <h2>Interval Walking Training</h2>
           <button
             class="close-btn"
             @click="closeTreadmill"
@@ -376,12 +376,12 @@
           <div class="run-timer-display">
             <p class="run-timer-clock">
               {{ treadmillClockLabel }}
-              <span class="treadmill-incline-tag">{{ currentTreadmillSegment.incline }}</span>
             </p>
             <div class="run-timer-stats treadmill-stats">
-              <div class="run-stat">
-                <span class="run-stat-label">Speed</span>
+              <div class="run-stat treadmill-current-stat">
+                <span class="run-stat-label">Speed <span class="treadmill-incline-tag">{{ currentTreadmillSegment.incline }}</span></span>
                 <span class="run-stat-value run-stat-value-lg">{{ currentTreadmillSegment.speed }}</span>
+                <span class="run-stat-timeleft">⏱️ {{ currentTreadmillTimeLeft }} · 🔥 {{ treadmillCaloriesBurned }} kcal</span>
               </div>
             </div>
             <div
@@ -393,6 +393,17 @@
                 :style="{ width: `${treadmillSegmentProgress}%` }"
               />
             </div>
+            <Transition name="speed-pop">
+              <div
+                v-if="speedChangePopup"
+                class="speed-change-popup"
+                aria-live="assertive"
+              >
+                <span class="speed-change-label">New Speed</span>
+                <span class="speed-change-value">{{ speedChangePopup }}</span>
+                <span class="speed-change-countdown">{{ speedChangeCountdown }}</span>
+              </div>
+            </Transition>
             <div class="treadmill-upcoming">
               <div
                 v-if="nextTreadmillSegment"
@@ -402,28 +413,11 @@
                   <div class="treadmill-next-info">
                     <span class="treadmill-next-label">Next</span>
                     <span class="treadmill-next-name treadmill-next-speed">{{ nextTreadmillSegment.speed }}</span>
-                    <span class="treadmill-next-time">{{ nextTreadmillSegment.durationLabel }}</span>
                   </div>
                   <span
                     v-if="nextTreadmillCountdown !== null"
                     class="treadmill-next-countdown"
                   >{{ nextTreadmillCountdown }}<small>s</small></span>
-                </div>
-              </div>
-              <div
-                v-if="nextNextTreadmillSegment"
-                class="treadmill-next-card treadmill-next-card-2 treadmill-next-card-lg"
-              >
-                <div class="treadmill-next-row">
-                  <div class="treadmill-next-info">
-                    <span class="treadmill-next-label">Then</span>
-                    <span class="treadmill-next-name treadmill-next-speed">{{ nextNextTreadmillSegment.speed }}</span>
-                    <span class="treadmill-next-time">{{ nextNextTreadmillSegment.durationLabel }}</span>
-                  </div>
-                  <span
-                    v-if="nextNextTreadmillCountdown !== null"
-                    class="treadmill-next-countdown"
-                  >{{ nextNextTreadmillCountdown }}<small>s</small></span>
                 </div>
               </div>
             </div>
@@ -1247,24 +1241,18 @@ let treadmillStartMs = 0
 let treadmillBaseElapsed = 0
 
 const treadmillPlan: RunSegment[] = [
-  { label: 'Warm-Up Walk', speed: '3.0 mph', incline: '1%', seconds: 300, durationLabel: '0:00-5:00' },
-  { label: 'Sprint 1', speed: '8.5 mph', incline: '1%', seconds: 20, durationLabel: '5:00-5:20' },
-  { label: 'Rest 1', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '5:20-5:30' },
-  { label: 'Sprint 2', speed: '9.0 mph', incline: '1%', seconds: 20, durationLabel: '5:30-5:50' },
-  { label: 'Rest 2', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '5:50-6:00' },
-  { label: 'Sprint 3', speed: '9.0 mph', incline: '1%', seconds: 20, durationLabel: '6:00-6:20' },
-  { label: 'Rest 3', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '6:20-6:30' },
-  { label: 'Sprint 4', speed: '9.5 mph', incline: '1%', seconds: 20, durationLabel: '6:30-6:50' },
-  { label: 'Rest 4', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '6:50-7:00' },
-  { label: 'Sprint 5', speed: '9.5 mph', incline: '1%', seconds: 20, durationLabel: '7:00-7:20' },
-  { label: 'Rest 5', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '7:20-7:30' },
-  { label: 'Sprint 6', speed: '10.0 mph', incline: '1%', seconds: 20, durationLabel: '7:30-7:50' },
-  { label: 'Rest 6', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '7:50-8:00' },
-  { label: 'Sprint 7', speed: '10.0 mph', incline: '1%', seconds: 20, durationLabel: '8:00-8:20' },
-  { label: 'Rest 7', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '8:20-8:30' },
-  { label: 'Sprint 8', speed: '10.5 mph', incline: '1%', seconds: 20, durationLabel: '8:30-8:50' },
-  { label: 'Rest 8', speed: '2.5 mph', incline: '1%', seconds: 10, durationLabel: '8:50-9:00' },
-  { label: 'Cool-Down Walk', speed: '3.0 mph', incline: '1%', seconds: 180, durationLabel: '9:00-12:00' },
+  { label: 'Warm-Up Walk', speed: '2.5 mph', incline: '1%', seconds: 120, durationLabel: '0:00-2:00' },
+  { label: 'Low 1', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '2:00-3:30' },
+  { label: 'High 1', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '3:30-5:00' },
+  { label: 'Low 2', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '5:00-6:30' },
+  { label: 'High 2', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '6:30-8:00' },
+  { label: 'Low 3', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '8:00-9:30' },
+  { label: 'High 3', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '9:30-11:00' },
+  { label: 'Low 4', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '11:00-12:30' },
+  { label: 'High 4', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '12:30-14:00' },
+  { label: 'Low 5', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '14:00-15:30' },
+  { label: 'High 5', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '15:30-17:00' },
+  { label: 'Cool-Down Walk', speed: '2.5 mph', incline: '1%', seconds: 180, durationLabel: '17:00-20:00' },
 ]
 
 const treadmillTotalSeconds = treadmillPlan.reduce(
@@ -1289,9 +1277,41 @@ const currentTreadmillSegment = computed(
 const nextTreadmillSegment = computed(
   () => treadmillPlan[currentTreadmillSegmentIndex.value + 1] || null,
 )
-const nextNextTreadmillSegment = computed(
-  () => treadmillPlan[currentTreadmillSegmentIndex.value + 2] || null,
-)
+const currentTreadmillTimeLeft = computed(() => {
+  let endOfCurrent = 0
+  for (let i = 0; i <= currentTreadmillSegmentIndex.value; i += 1) {
+    endOfCurrent += treadmillPlan[i]!.seconds
+  }
+  const left = Math.max(endOfCurrent - treadmillElapsed.value, 0)
+  const mins = Math.floor(left / 60)
+  const secs = left % 60
+  return `${mins}:${String(secs).padStart(2, '0')}`
+})
+
+const TREADMILL_BODYWEIGHT_KG = 70
+const treadmillSpeedMets: Record<string, number> = {
+  '2.5 mph': 2.5,
+  '3.0 mph': 3.5,
+  '4.0 mph': 5.0,
+}
+
+const treadmillCaloriesBurned = computed(() => {
+  let cal = 0
+  for (let i = 0; i <= currentTreadmillSegmentIndex.value; i += 1) {
+    const seg = treadmillPlan[i]!
+    const met = treadmillSpeedMets[seg.speed] ?? 3.5
+    let segSeconds = seg.seconds
+    if (i === currentTreadmillSegmentIndex.value) {
+      let elapsedBefore = 0
+      for (let j = 0; j < i; j += 1) {
+        elapsedBefore += treadmillPlan[j]!.seconds
+      }
+      segSeconds = Math.min(Math.max(treadmillElapsed.value - elapsedBefore, 0), seg.seconds)
+    }
+    cal += (met * 3.5 * TREADMILL_BODYWEIGHT_KG / 200) * (segSeconds / 60)
+  }
+  return Math.round(cal)
+})
 
 const treadmillClockLabel = computed(() => {
   const remaining = Math.max(treadmillTotalSeconds - treadmillElapsed.value, 0)
@@ -1321,17 +1341,6 @@ const nextTreadmillCountdown = computed(() => {
   return Math.max(endOfCurrent - treadmillElapsed.value, 0)
 })
 
-const nextNextTreadmillCountdown = computed(() => {
-  if (!nextNextTreadmillSegment.value) {
-    return null
-  }
-  let endOfNext = 0
-  for (let i = 0; i <= currentTreadmillSegmentIndex.value + 1; i += 1) {
-    endOfNext += treadmillPlan[i]!.seconds
-  }
-  return Math.max(endOfNext - treadmillElapsed.value, 0)
-})
-
 const stopTreadmillInterval = () => {
   if (treadmillHandle !== null) {
     clearInterval(treadmillHandle)
@@ -1354,6 +1363,9 @@ const persistTreadmillAnchor = () => {
 }
 
 const lastTreadmillSegmentIndex = ref(0)
+const speedChangePopup = ref<string | null>(null)
+const speedChangeCountdown = ref(0)
+const lastBeepCountdown = ref<number | null>(null)
 
 const playBeep = (freq = 880, duration = 150) => {
   if (!import.meta.client) {
@@ -1396,7 +1408,20 @@ const syncTreadmillElapsed = () => {
   treadmillElapsed.value = elapsed
   if (currentTreadmillSegmentIndex.value !== lastTreadmillSegmentIndex.value) {
     lastTreadmillSegmentIndex.value = currentTreadmillSegmentIndex.value
-    playBeep(880, 200)
+  }
+  const countdown = nextTreadmillCountdown.value
+  if (countdown !== null && countdown > 0 && countdown <= 5) {
+    speedChangePopup.value = nextTreadmillSegment.value!.speed
+    speedChangeCountdown.value = countdown
+    if (lastBeepCountdown.value !== countdown) {
+      lastBeepCountdown.value = countdown
+      playBeep(880, 200)
+    }
+  }
+  else {
+    speedChangePopup.value = null
+    speedChangeCountdown.value = 0
+    lastBeepCountdown.value = null
   }
 }
 

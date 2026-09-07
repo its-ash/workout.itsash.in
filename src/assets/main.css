@@ -803,7 +803,7 @@ button:disabled {
 
 .run-timer-clock {
   margin: 0;
-  font-size: clamp(2.4rem, 20vw, 5rem);
+  font-size: clamp(3rem, 26vw, 6.5rem);
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -853,30 +853,96 @@ button:disabled {
 
 .treadmill-stats .run-stat {
   background: var(--yellow);
-  padding: 0.8rem 1.2rem;
+  padding: 1rem 1.4rem;
   flex: 1 1 0;
   text-align: center;
 }
 
 .treadmill-stats .run-stat-label {
-  font-size: clamp(0.7rem, 3vw, 0.9rem);
+  font-size: clamp(0.85rem, 4vw, 1.1rem);
   font-weight: 800;
 }
 
 .treadmill-stats .run-stat-value-lg {
-  font-size: clamp(1.8rem, 9vw, 3rem);
+  font-size: clamp(2.4rem, 13vw, 4rem);
+}
+
+.treadmill-current-stat {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.run-stat-timeleft {
+  font-size: clamp(1.1rem, 5vw, 1.6rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-change-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: var(--yellow);
+  border: 3px solid var(--fg);
+  box-shadow: 6px 6px 0 0 var(--fg);
+  padding: 1.5rem 2.5rem;
+  display: grid;
+  gap: 0.3rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.speed-change-label {
+  font-size: clamp(0.9rem, 4vw, 1.2rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg);
+}
+
+.speed-change-value {
+  font-size: clamp(2.5rem, 14vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-change-countdown {
+  font-size: clamp(1.5rem, 8vw, 2.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--red);
+  font-variant-numeric: tabular-nums;
+}
+
+.speed-pop-enter-active,
+.speed-pop-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.speed-pop-enter-from,
+.speed-pop-leave-to {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
 }
 
 .treadmill-incline-tag {
-  font-size: 0.3em;
+  font-size: 0.85em;
   font-weight: 800;
   vertical-align: middle;
-  margin-left: 0.5rem;
-  padding: 0.15rem 0.5rem;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.35rem;
   border: 2px solid var(--fg);
   background: var(--yellow);
   color: var(--fg);
   letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .run-timer-next {
