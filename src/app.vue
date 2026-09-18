@@ -1241,18 +1241,18 @@ let treadmillStartMs = 0
 let treadmillBaseElapsed = 0
 
 const treadmillPlan: RunSegment[] = [
-  { label: 'Warm-Up Walk', speed: '2.5 mph', incline: '1%', seconds: 120, durationLabel: '0:00-2:00' },
-  { label: 'Low 1', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '2:00-3:30' },
-  { label: 'High 1', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '3:30-5:00' },
-  { label: 'Low 2', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '5:00-6:30' },
-  { label: 'High 2', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '6:30-8:00' },
-  { label: 'Low 3', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '8:00-9:30' },
-  { label: 'High 3', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '9:30-11:00' },
-  { label: 'Low 4', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '11:00-12:30' },
-  { label: 'High 4', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '12:30-14:00' },
-  { label: 'Low 5', speed: '3.0 mph', incline: '1%', seconds: 90, durationLabel: '14:00-15:30' },
-  { label: 'High 5', speed: '4.0 mph', incline: '1%', seconds: 90, durationLabel: '15:30-17:00' },
-  { label: 'Cool-Down Walk', speed: '2.5 mph', incline: '1%', seconds: 180, durationLabel: '17:00-20:00' },
+  { label: 'Warm-Up Walk', speed: '4.5 km/h', incline: '1%', seconds: 120, durationLabel: '0:00-2:00' },
+  { label: 'Low 1', speed: '4.5 km/h', incline: '1%', seconds: 90, durationLabel: '2:00-3:30' },
+  { label: 'High 1', speed: '6.5 km/h', incline: '1%', seconds: 90, durationLabel: '3:30-5:00' },
+  { label: 'Low 2', speed: '4.5 km/h', incline: '1%', seconds: 90, durationLabel: '5:00-6:30' },
+  { label: 'High 2', speed: '6.5 km/h', incline: '1%', seconds: 90, durationLabel: '6:30-8:00' },
+  { label: 'Low 3', speed: '4.5 km/h', incline: '1%', seconds: 90, durationLabel: '8:00-9:30' },
+  { label: 'High 3', speed: '6.5 km/h', incline: '1%', seconds: 90, durationLabel: '9:30-11:00' },
+  { label: 'Low 4', speed: '4.5 km/h', incline: '1%', seconds: 90, durationLabel: '11:00-12:30' },
+  { label: 'High 4', speed: '6.5 km/h', incline: '1%', seconds: 90, durationLabel: '12:30-14:00' },
+  { label: 'Low 5', speed: '4.5 km/h', incline: '1%', seconds: 90, durationLabel: '14:00-15:30' },
+  { label: 'High 5', speed: '6.5 km/h', incline: '1%', seconds: 90, durationLabel: '15:30-17:00' },
+  { label: 'Cool-Down Walk', speed: '4.5 km/h', incline: '1%', seconds: 180, durationLabel: '17:00-20:00' },
 ]
 
 const treadmillTotalSeconds = treadmillPlan.reduce(
@@ -1290,9 +1290,8 @@ const currentTreadmillTimeLeft = computed(() => {
 
 const TREADMILL_BODYWEIGHT_KG = 70
 const treadmillSpeedMets: Record<string, number> = {
-  '2.5 mph': 2.5,
-  '3.0 mph': 3.5,
-  '4.0 mph': 5.0,
+  '4.5 km/h': 3.0,
+  '6.5 km/h': 4.3,
 }
 
 const treadmillCaloriesBurned = computed(() => {
