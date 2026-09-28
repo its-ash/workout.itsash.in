@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WorkOut - Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          accent: {
+            DEFAULT: '#3F5138',
+            100: '#E8ECE3',
+            600: '#3F5138',
+            700: '#32412D',
+          },
+        },
+        boxShadow: {
+          soft: '0 1px 2px rgba(30,28,22,0.04), 0 8px 24px -12px rgba(30,28,22,0.12)',
+          lift: '0 2px 6px rgba(30,28,22,0.05), 0 16px 32px -16px rgba(30,28,22,0.16)',
+        },
+        borderRadius: {
+          '4xl': '2rem',
+          '5xl': '2.5rem',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .row-enter {
+    animation: fadeInUp 420ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  .row-enter:nth-child(1) { animation-delay: 0ms; }
+  .row-enter:nth-child(2) { animation-delay: 50ms; }
+  .row-enter:nth-child(3) { animation-delay: 100ms; }
+  .row-enter:nth-child(4) { animation-delay: 150ms; }
+  .row-enter:nth-child(5) { animation-delay: 200ms; }
+  .row-enter:nth-child(6) { animation-delay: 250ms; }
+
+  .press {
+    transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .press:active {
+    transform: scale(0.96);
+  }
+
+  ::-webkit-scrollbar { width: 0px; height: 0px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .row-enter {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .press { transition: opacity 160ms ease !important; }
+    .press:active { transform: none !important; opacity: 0.85; }
+  }
+</style>
+</head>
+<body class="min-h-dvh bg-gradient-to-b from-[#F8F7F3] via-[#F6F5F0] to-[#EFEDE6] font-sans text-black antialiased">
+
+  <div class="min-h-dvh w-full flex items-center justify-center md:py-12 lg:py-16 px-0 md:px-6">
+
+    <main
+      class="relative w-full md:max-w-[420px] min-h-dvh md:min-h-0 md:h-[860px] bg-white md:rounded-[40px] md:shadow-lift md:ring-1 md:ring-black/[0.04] flex flex-col overflow-hidden"
+      aria-label="WorkOut home screen"
+    >
+
+      <!-- Top bar -->
+      <header class="shrink-0 flex items-center justify-between px-6 pt-8 pb-2">
+        <h1 class="text-2xl font-extrabold tracking-tight">WorkOut</h1>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Open stretching routine"
+            class="press w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+              <circle cx="12" cy="4.5" r="1.75"></circle>
+              <path d="M12 8v4.5M12 8l-4 3M12 8l4-3M12 12.5l-3.5 6M12 12.5l3.5 6"></path>
+            </svg>
+          </button>
+          <button
+            type="button"
+            aria-label="Open interval walking timer"
+            class="press w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+              <circle cx="12" cy="13" r="7.5"></circle>
+              <path d="M12 13V9.5M9.5 3.5h5M12 3.5V5"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Segmented control -->
+      <div class="shrink-0 px-6 pt-4">
+        <div role="tablist" aria-label="Workout split" class="grid grid-cols-3 gap-1 bg-[#F2F1EC] rounded-2xl p-1">
+          <button role="tab" aria-selected="true" type="button" class="press rounded-xl bg-white text-black shadow-soft py-2.5 text-sm font-bold transition-colors duration-200">
+            Push
+          </button>
+          <button role="tab" aria-selected="false" type="button" class="press rounded-xl text-black/55 py-2.5 text-sm font-semibold hover:text-black/75 transition-colors duration-200">
+            Pull
+          </button>
+          <button role="tab" aria-selected="false" type="button" class="press rounded-xl text-black/55 py-2.5 text-sm font-semibold hover:text-black/75 transition-colors duration-200">
+            Legs
+          </button>
+        </div>
+      </div>
+
+      <!-- Today's session card -->
+      <div class="shrink-0 px-6 pt-5">
+        <div class="rounded-3xl bg-[#F5F4EE] p-5 flex items-center justify-between gap-4 shadow-soft">
+          <div class="min-w-0">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-black/45">Today's session</p>
+            <h2 class="text-xl font-extrabold tracking-tight mt-1 truncate">Push Day A</h2>
+            <p class="text-sm font-medium text-black/55 mt-0.5">6 exercises · ~48 min</p>
+          </div>
+          <div class="shrink-0 flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Shuffle workout variation"
+              class="press w-10 h-10 rounded-full bg-white flex items-center justify-center text-black shadow-soft hover:bg-white/80 transition-colors duration-200"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5">
+                <path d="M4 6h3.2c2 0 3 .8 4 2.3l.5.9M4 18h3.2c2 0 3-.8 4-2.3l2.8-4.2c1-1.5 2-2.3 4-2.3H20M16.5 3.5l3 2.3-3 2.3M16.5 15.9l3 2.3-3 2.3"></path>
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label="Cycle to next workout variation"
+              class="press w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white shadow-soft hover:bg-accent-700 transition-colors duration-200"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5">
+                <path d="M5 12h14M13 6l6 6-6 6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise list -->
+      <div class="flex-1 min-h-0 overflow-y-auto px-6 pt-5 pb-4">
+        <ul class="flex flex-col gap-3">
+
+          <li class="row-enter flex items-center gap-4 rounded-2xl border border-black/[0.07] p-4 hover:border-black/[0.12] transition-colors duration-200">
+            <button type="button" aria-label="Preview Bench Press demo" class="press shrink-0 w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200">
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 translate-x-[1px]"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"></path></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-[15px] truncate">Bench Press</p>
+              <p class="text-sm font-medium text-black/55 mt-0.5">4 sets x 8-10 reps · RIR 0-1</p>
+            </div>
+          </li>
+
+          <li class="row-enter flex items-center gap-4 rounded-2xl border border-black/[0.07] p-4 hover:border-black/[0.12] transition-colors duration-200">
+            <button type="button" aria-label="Preview Overhead Press demo" class="press shrink-0 w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200">
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 translate-x-[1px]"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"></path></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-[15px] truncate">Overhead Press</p>
+              <p class="text-sm font-medium text-black/55 mt-0.5">3 sets x 8-10 reps · RIR 1-2</p>
+            </div>
+          </li>
+
+          <li class="row-enter flex items-center gap-4 rounded-2xl border border-black/[0.07] p-4 hover:border-black/[0.12] transition-colors duration-200">
+            <button type="button" aria-label="Preview Incline Dumbbell Press demo" class="press shrink-0 w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200">
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 translate-x-[1px]"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"></path></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-[15px] truncate">Incline Dumbbell Press</p>
+              <p class="text-sm font-medium text-black/55 mt-0.5">3 sets x 10-12 reps · RIR 1-2</p>
+            </div>
+          </li>
+
+          <li class="row-enter flex items-center gap-4 rounded-2xl border border-black/[0.07] p-4 hover:border-black/[0.12] transition-colors duration-200">
+            <button type="button" aria-label="Preview Lateral Raise demo" class="press shrink-0 w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200">
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 translate-x-[1px]"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"></path></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-[15px] truncate">Lateral Raise</p>
+              <p class="text-sm font-medium text-black/55 mt-0.5">3 sets x 12-15 reps · RIR 0-1</p>
+            </div>
+          </li>
+
+          <li class="row-enter flex items-center gap-4 rounded-2xl border border-black/[0.07] p-4 hover:border-black/[0.12] transition-colors duration-200">
+            <button type="button" aria-label="Preview Triceps Pushdown demo" class="press shrink-0 w-11 h-11 rounded-full bg-[#F2F1EC] flex items-center justify-center text-black hover:bg-[#EBE9E2] transition-colors duration-200">
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 translate-x-[1px]"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"></path></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-[15px] truncate">Triceps Pushdown</p>
+              <p class="text-sm font-medium text-black/55 mt-0.5">3 sets x 10-12 reps · RIR 0-1</p>
+            </div>
+          </li>
+
+          <li class="row-enter flex items-center gap-4 rounded-2xl border border-accent/20 bg-accent-100/40 p-4 hover:border-accent/35 transition-colors duration-200">
+            <button type="button" aria-label="Preview Treadmill Walk Run Finisher demo" class="press shrink-0 w-11 h-11 rounded-full bg-white flex items-center justify-center text-black shadow-soft">
+              <svg viewBox="0 0 24 24" class="w-3.5 h-3.5 translate-x-[1px]"><path d="M6 4.5v15l13-7.5-13-7.5z" fill="currentColor"></path></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-[15px] truncate">Treadmill Walk/Run Finisher</p>
+              <p class="text-sm font-medium text-black/55 mt-0.5">10 min · 1:1 work-rest intervals</p>
+              <span class="inline-flex items-center gap-1.5 mt-2 rounded-full bg-accent-100 text-accent-700 text-xs font-bold px-2.5 py-1">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <circle cx="12" cy="12" r="8.5"></circle>
+                  <path d="M12 7.5V12l3 2"></path>
+                </svg>
+                Tap for pace guide
+              </span>
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <!-- Sticky bottom action bar -->
+      <div class="shrink-0 px-6 pt-4 pb-8 bg-white/95 backdrop-blur-sm border-t border-black/[0.06] flex items-center gap-3">
+        <button type="button" class="press flex-1 rounded-2xl bg-accent text-white font-bold text-[15px] py-4 shadow-soft hover:bg-accent-700 transition-colors duration-200">
+          Start Workout
+        </button>
+        <button type="button" class="press rounded-2xl border border-black/15 text-black font-semibold text-[15px] py-4 px-5 hover:bg-[#F5F4EF] transition-colors duration-200 inline-flex items-center gap-2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-4.5 h-4.5">
+            <path d="M12 4v11M8 11l4 4 4-4M5 19.5h14"></path>
+          </svg>
+          Install App
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

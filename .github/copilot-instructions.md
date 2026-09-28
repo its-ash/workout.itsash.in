@@ -38,7 +38,7 @@ Makefile             # deploy / run / commit commands
 ## Conventions
 - **Code style**: ESLint flat config enforces `@stylistic` rules — follow existing formatting; quotes/indentation are enforced.
 - **Vue SFCs**: `<script setup lang="ts">`; keep reactive state in `reactive`/`ref`; use `computed` for derived values.
-- **No CSS framework**: use CSS variables defined in `src/assets/main.css`; match the existing brutalist design (2px borders, hard box-shadows).
+- **No CSS framework**: use CSS variables defined in `src/assets/main.css`; match the dark design (Manrope, `#0a0a0a` bg, `#c8ff4d` accent, rounded cards/pill buttons, 1px translucent borders).
 - **No comments** in code unless explicitly requested.
 - **i18n**: exercise instructions support only `en` and `hi`. Do not add other languages; update `exercises.schema.json` if language set changes.
 - **PWA**: updates require manual prompt — do not reintroduce `autoUpdate` or auto-update banners.

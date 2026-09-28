@@ -8,7 +8,7 @@ export default defineNuxtConfig({
     baseURL: "/",
     head: {
       meta: [
-        { name: "theme-color", content: "#171e19" },
+        { name: "theme-color", content: "#0a0a0a" },
         { name: "apple-mobile-web-app-capable", content: "yes" },
         {
           name: "apple-mobile-web-app-status-bar-style",
@@ -56,8 +56,8 @@ export default defineNuxtConfig({
       description: "Track split workouts and progress day by day.",
       lang: "en",
       orientation: "portrait",
-      theme_color: "#171e19",
-      background_color: "#eeebe3",
+      theme_color: "#0a0a0a",
+      background_color: "#0a0a0a",
       display: "standalone",
       start_url: "/",
       scope: "/",

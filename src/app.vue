@@ -1,124 +1,270 @@
 <!-- eslint-disable @stylistic/quotes -->
 <template>
-  <main class="app-shell">
-    <header class="topbar glass">
-      <div class="header-actions">
-        <button
-          class="secondary"
-          aria-label="Open stretching routine"
-          title="Stretching routine"
-          @click="showStretchingModal = true"
-        >
-          🧘
-        </button>
-        <button
-          class="secondary"
-          aria-label="Open interval walking training"
-          title="Interval Walking Training"
-          @click="showTreadmillModal = true"
-        >
-          🏃
-        </button>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
         <h1>WorkOut</h1>
+        <div class="header-actions">
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Stretching routine"
+            title="Stretching routine"
+            @click="showStretchingModal = true"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle
+                cx="12"
+                cy="4.5"
+                r="1.75"
+              />
+              <path d="M12 8v6" />
+              <path d="M12 9.5 7 7" />
+              <path d="M12 9.5l6 1.5" />
+              <path d="M12 14l-3.5 6" />
+              <path d="M12 14l4 5.5" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Interval walk timer"
+            title="Interval walk timer"
+            @click="showTreadmillModal = true"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M9 2h6" />
+              <circle
+                cx="12"
+                cy="13"
+                r="8"
+              />
+              <path d="M12 13V9" />
+              <path d="M12 13l3 1.5" />
+              <path d="M18.5 6.5 20 5" />
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
-    <section class="workspace">
-      <div class="content-stack">
-        <section class="day-card">
-          <div class="session-selector">
-            <button
-              v-for="t in sessionTypes"
-              :key="t.id"
-              class="session-type-btn"
-              :class="{ active: state.sessionType === t.id }"
-              @click="selectSessionType(t.id)"
-            >
-              {{ t.icon }} {{ t.label }}
-            </button>
-          </div>
-          <div class="day-progress">
-            <div class="day-progress-head">
+    <main class="page">
+      <div
+        role="tablist"
+        aria-label="Workout split"
+        class="segmented"
+      >
+        <button
+          v-for="t in sessionTypes"
+          :key="t.id"
+          type="button"
+          role="tab"
+          :aria-selected="state.sessionType === t.id"
+          class="segment"
+          :class="{ active: state.sessionType === t.id }"
+          @click="selectSessionType(t.id)"
+        >
+          {{ t.label }}
+        </button>
+      </div>
+
+      <div class="content-grid">
+        <section class="session-col">
+          <div class="card session-card">
+            <p class="eyebrow">
+              Today's session
+            </p>
+            <h2>{{ dayTitle }}</h2>
+            <p class="session-meta">
+              {{ sessionMeta }}
+            </p>
+            <div class="session-actions">
               <button
-                class="day-nav-btn"
-                aria-label="Shuffle workout"
-                title="Shuffle workout"
+                type="button"
+                class="icon-btn icon-btn-lg"
+                aria-label="Shuffle workout variation"
+                title="Shuffle"
                 @click="shuffleWorkout"
               >
-                🎲
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M3 5h4l6 14h5" />
+                  <path d="M14 5h4l1.5 2" />
+                  <path d="M3 15.5h4l1.5-3.5" />
+                  <path d="M17 3l2.5 2L17 7" />
+                  <path d="M17 13.5l2.5 2-2.5 2" />
+                </svg>
               </button>
-              <p class="day-progress-title">
-                {{ dayTitle }}
-              </p>
               <button
-                class="day-nav-btn"
-                aria-label="Next variation"
-                title="Next variation"
+                type="button"
+                class="pill-btn next-btn"
+                aria-label="Next workout variation"
                 @click="nextVariation"
               >
-                &rarr;
+                Next variation
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12h14" />
+                  <path d="M13 6l6 6-6 6" />
+                </svg>
               </button>
             </div>
           </div>
+        </section>
+
+        <section class="list-col">
+          <h3 class="list-title">
+            Exercises
+          </h3>
           <ul class="workouts">
             <li
               v-for="item in detailedWorkout"
               :key="item.name + item.plan"
+              class="card workout-item"
               :class="{ clickable: item.name === runWalkName }"
               @click="item.name === runWalkName && (showRunTimerModal = true)"
             >
-              <div class="workout-row">
-                <div class="workout-text">
-                  <p class="workout-name">
-                    {{ item.name }}
-                    <span
-                      v-if="item.name === runWalkName"
-                      class="timer-hint"
-                    >⏱️ Tap for pace guide</span>
-                  </p>
-                  <p class="workout-plan">
-                    {{ item.plan }}
-                  </p>
-                </div>
-                <button
-                  v-if="item.gif"
-                  class="secondary workout-view-btn"
-                  aria-label="View exercise gif"
-                  title="View exercise"
-                  @click.stop="openGifModal(item)"
+              <button
+                v-if="item.name === runWalkName"
+                type="button"
+                class="icon-btn icon-btn-lg"
+                aria-label="Open run/walk pace guide"
+                @click.stop="showRunTimerModal = true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
                 >
-                  ▶
-                </button>
+                  <circle
+                    cx="12"
+                    cy="13"
+                    r="8"
+                  />
+                  <path d="M12 13V9" />
+                  <path d="M12 13l3 1.5" />
+                </svg>
+              </button>
+              <button
+                v-else-if="item.gif"
+                type="button"
+                class="icon-btn icon-btn-lg"
+                :aria-label="`Preview ${item.name} demo`"
+                @click.stop="openGifModal(item)"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  class="play-icon"
+                  aria-hidden="true"
+                >
+                  <path d="M6 4.5v15l13-7.5-13-7.5z" />
+                </svg>
+              </button>
+              <span
+                v-else
+                class="icon-placeholder"
+                aria-hidden="true"
+              />
+              <div class="workout-text">
+                <p class="workout-name">
+                  {{ item.name }}
+                </p>
+                <p class="workout-plan">
+                  {{ item.plan }}
+                </p>
+                <span
+                  v-if="item.name === runWalkName"
+                  class="badge"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="12"
+                      cy="13"
+                      r="8"
+                    />
+                    <path d="M12 13V9" />
+                    <path d="M12 13l3 1.5" />
+                  </svg>
+                  Tap for pace guide
+                </span>
               </div>
             </li>
           </ul>
         </section>
       </div>
-    </section>
+    </main>
 
-    <div class="actions day-actions">
-      <button
-        v-if="canInstall"
-        class="secondary"
-        @click="installApp"
-      >
-        Install App
-      </button>
-      <button
-        class="secondary"
-        :disabled="isSessionActive"
-        @click="startSession"
-      >
-        {{ isSessionActive ? sessionClockLabel : "Start" }}
-      </button>
-      <button
-        v-if="isSessionActive"
-        class="primary"
-        @click="requestStopSession"
-      >
-        Stop
-      </button>
-    </div>
+    <footer class="action-bar">
+      <div class="action-bar-inner">
+        <button
+          type="button"
+          class="btn-primary"
+          :disabled="isSessionActive"
+          @click="startSession"
+        >
+          {{ isSessionActive ? sessionClockLabel : "Start" }}
+        </button>
+        <button
+          v-if="isSessionActive"
+          type="button"
+          class="btn-danger"
+          @click="requestStopSession"
+        >
+          Stop
+        </button>
+        <button
+          v-if="canInstall"
+          type="button"
+          class="btn-outline"
+          @click="installApp"
+        >
+          Install App
+        </button>
+      </div>
+    </footer>
 
     <!-- Stretching Modal -->
     <div
@@ -131,9 +277,19 @@
           <h2>Full Body Stretching Routine</h2>
           <button
             class="close-btn"
+            aria-label="Close"
             @click="showStretchingModal = false"
           >
-            ✕
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </div>
         <div class="stretching-list">
@@ -166,7 +322,7 @@
             <div class="stretch-info">
               <h3>{{ stretch.name }}</h3>
               <p class="stretch-duration">
-                ⏱️ {{ stretch.duration }}
+                {{ stretch.duration }}
               </p>
               <p class="stretch-description">
                 {{ stretch.description }}
@@ -176,7 +332,7 @@
         </div>
         <div class="modal-footer">
           <button
-            class="primary"
+            class="btn-primary"
             @click="showStretchingModal = false"
           >
             Done
@@ -196,9 +352,19 @@
           <h2>{{ activeGif?.name }}</h2>
           <button
             class="close-btn"
+            aria-label="Close"
             @click="closeGifModal"
           >
-            ✕
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </div>
         <div class="gif-body">
@@ -227,7 +393,7 @@
         </div>
         <div class="modal-footer">
           <button
-            class="primary"
+            class="btn-primary"
             @click="closeGifModal"
           >
             Done
@@ -247,9 +413,19 @@
           <h2>Stop Workout Session?</h2>
           <button
             class="close-btn"
+            aria-label="Close"
             @click="cancelStopSession"
           >
-            ✕
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </div>
         <div class="session-timer-body">
@@ -262,13 +438,13 @@
         </div>
         <div class="modal-footer">
           <button
-            class="secondary"
+            class="btn-outline"
             @click="cancelStopSession"
           >
             Cancel
           </button>
           <button
-            class="primary"
+            class="btn-primary"
             @click="confirmStopSession"
           >
             Stop & Export
@@ -288,9 +464,19 @@
           <h2>Run/Walk Interval Timer</h2>
           <button
             class="close-btn"
+            aria-label="Close"
             @click="closeRunTimer"
           >
-            ✕
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </div>
 
@@ -319,13 +505,13 @@
 
           <div class="run-timer-controls">
             <button
-              class="primary"
+              class="btn-primary"
               @click="toggleRunTimer"
             >
               {{ isRunTimerActive ? "Pause" : (runTimerElapsed > 0 ? "Resume" : "Start") }}
             </button>
             <button
-              class="secondary"
+              class="btn-outline"
               @click="resetRunTimer"
             >
               Reset
@@ -347,7 +533,7 @@
 
         <div class="modal-footer">
           <button
-            class="primary"
+            class="btn-primary"
             @click="closeRunTimer"
           >
             Done
@@ -366,9 +552,19 @@
           <h2>Interval Walking Training</h2>
           <button
             class="close-btn"
+            aria-label="Close"
             @click="closeTreadmill"
           >
-            ✕
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </div>
 
@@ -381,7 +577,7 @@
               <div class="run-stat treadmill-current-stat">
                 <span class="run-stat-label">Speed <span class="treadmill-incline-tag">{{ currentTreadmillSegment.incline }}</span></span>
                 <span class="run-stat-value run-stat-value-lg">{{ currentTreadmillSegment.speed }}</span>
-                <span class="run-stat-timeleft">⏱️ {{ currentTreadmillTimeLeft }} · 🔥 {{ treadmillCaloriesBurned }} kcal</span>
+                <span class="run-stat-timeleft">{{ currentTreadmillTimeLeft }} left · {{ treadmillCaloriesBurned }} kcal</span>
               </div>
             </div>
             <div
@@ -425,14 +621,14 @@
 
           <div class="run-timer-controls">
             <button
-              class="primary"
+              class="btn-primary"
               @click="toggleTreadmill"
             >
               {{ isTreadmillActive ? "Pause" : (treadmillElapsed > 0 ? "Resume" : "Start") }}
             </button>
             <button
               v-if="treadmillElapsed > 0"
-              class="secondary"
+              class="btn-outline"
               @click="resetTreadmill"
             >
               Reset
@@ -456,7 +652,7 @@
 
         <div class="modal-footer">
           <button
-            class="primary"
+            class="btn-primary"
             @click="closeTreadmill"
           >
             Done
@@ -464,7 +660,7 @@
         </div>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -479,10 +675,10 @@ type WorkoutState = {
 }
 type WorkoutLine = { name: string, plan: string, gif?: string }
 
-const sessionTypes: { id: SessionType, label: string, icon: string }[] = [
-  { id: 'push', label: 'Push', icon: '💪' },
-  { id: 'pull', label: 'Pull', icon: '🏋️' },
-  { id: 'legs', label: 'Legs', icon: '🦵' },
+const sessionTypes: { id: SessionType, label: string }[] = [
+  { id: 'push', label: 'Push' },
+  { id: 'pull', label: 'Pull' },
+  { id: 'legs', label: 'Legs' },
 ]
 
 type ExerciseRecord = {
@@ -589,7 +785,8 @@ const exerciseSynonyms: Record<string, string[]> = {
   'face pulls': ['rear delt row'],
   'reverse pec deck': ['lever reverse fly'],
   'dip machine': ['lever dip'],
-  'sealed chest supported row': ['chest supported row'],
+  'chest supported row': ['dumbbell incline row'],
+  'seated leg curl': ['lever seated leg curl'],
 }
 
 const gifBlacklist = new Set(['run walk interval protocol'])
@@ -712,6 +909,26 @@ const shuffleWorkout = () => {
   state.sessionId = randomSessionId(state.sessionType, state.sessionId)
   state.sessionHistory.push(state.sessionId)
 }
+
+const WORK_SECONDS_PER_SET = 40
+
+const estimateSeconds = (line: string) => {
+  const mins = line.match(/(\d+) min\b/)
+  if (mins) {
+    return Number(mins[1]) * 60
+  }
+  const sets = Number(line.match(/(\d+) sets?\b/)?.[1] ?? 0)
+  const rest = Number(line.match(/rest (\d+)s/)?.[1] ?? 0)
+  return sets * (WORK_SECONDS_PER_SET + rest)
+}
+
+const sessionMeta = computed(() => {
+  const pool = sessionsByType(state.sessionType)
+  const idx = pool.findIndex(s => s.id === currentSession.value.id)
+  const count = todayWorkout.value.length
+  const mins = Math.round(todayWorkout.value.reduce((acc, l) => acc + estimateSeconds(l), 0) / 60)
+  return `Variation ${idx + 1} of ${pool.length} · ${count} exercises · ~${mins} min`
+})
 
 const nextVariation = () => {
   const pool = sessionsByType(state.sessionType)
@@ -1203,10 +1420,6 @@ const installApp = async () => {
   await pwa.install()
 }
 
-const advancedProfile = {
-  effort: 'RIR 0-1',
-}
-
 const formatWorkout = (line: string): WorkoutLine => {
   const separator = line.indexOf(' - ')
   const name = separator > -1 ? line.slice(0, separator) : line
@@ -1214,7 +1427,7 @@ const formatWorkout = (line: string): WorkoutLine => {
 
   return {
     name,
-    plan: `${plan} · ${advancedProfile.effort}`,
+    plan: plan.split(', ').join(' · '),
   }
 }
 

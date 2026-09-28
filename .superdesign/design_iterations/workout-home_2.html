@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WorkOut — Home</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          grotesk: ['"Space Grotesk"', 'sans-serif'],
+          sora: ['"Sora"', 'sans-serif'],
+        },
+      },
+    },
+  };
+</script>
+<style>
+  :root { --accent: #E8402A; }
+  * { -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Sora', sans-serif; }
+  .font-grotesk { font-family: 'Space Grotesk', sans-serif; }
+
+  button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 9999px;
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 9999px;
+    border: 1px solid rgba(0,0,0,0.15);
+    color: #000;
+    background: #fff;
+    transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), transform 150ms cubic-bezier(0.23,1,0.32,1), border-color 150ms ease-out;
+  }
+  .icon-btn:active { transform: scale(0.95); }
+
+  @media (hover: hover) and (pointer: fine) {
+    .icon-btn:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.25); }
+    .tab-btn:hover:not([aria-selected="true"]) { color: rgba(0,0,0,0.75); }
+    .cta-primary:hover { background: #cf3620; }
+    .cta-ghost:hover { background: rgba(0,0,0,0.04); }
+    .pace-row:hover .pace-badge { border-color: rgba(0,0,0,0.35); }
+  }
+
+  .tab-btn { transition: color 150ms ease-out; }
+
+  .cta-primary, .cta-ghost {
+    transition: background-color 150ms cubic-bezier(0.23,1,0.32,1), transform 150ms cubic-bezier(0.23,1,0.32,1);
+  }
+  .cta-primary:active, .cta-ghost:active { transform: scale(0.98); }
+
+  .pace-row { transition: opacity 150ms ease-out; }
+  .pace-row:active { opacity: 0.7; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body class="bg-white text-black antialiased">
+  <div class="min-h-[100dvh] flex flex-col">
+
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-black/10">
+      <div class="max-w-2xl mx-auto px-4 md:px-8 py-4 md:py-5 flex items-center justify-between">
+        <h1 class="font-grotesk font-bold text-xl md:text-2xl tracking-tight">WorkOut</h1>
+        <div class="flex items-center gap-2">
+          <button type="button" aria-label="Stretching routine" class="icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="4.5" r="1.8"/>
+              <path d="M12 8v6"/>
+              <path d="M12 9l-4-3"/>
+              <path d="M12 9l4-3"/>
+              <path d="M12 14l-3.5 6"/>
+              <path d="M12 14l3.5 6"/>
+            </svg>
+          </button>
+          <button type="button" aria-label="Interval walking timer" class="icon-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 2h6"/>
+              <path d="M17 5l1.5-1.5"/>
+              <circle cx="12" cy="13" r="8"/>
+              <path d="M12 13V8.5"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-2xl mx-auto px-4 md:px-8 pt-6 md:pt-8 pb-32">
+
+      <div role="tablist" aria-label="Workout split" class="grid grid-cols-3 gap-1 bg-black/[0.04] rounded-full p-1 mb-8 md:mb-10">
+        <button type="button" role="tab" aria-selected="true" class="tab-btn relative rounded-full bg-white py-3 text-sm font-semibold text-black">
+          Push
+          <span class="absolute left-1/2 -translate-x-1/2 bottom-1 h-[2px] w-6 rounded-full" style="background: var(--accent);"></span>
+        </button>
+        <button type="button" role="tab" aria-selected="false" class="tab-btn rounded-full py-3 text-sm font-semibold text-black/50">
+          Pull
+        </button>
+        <button type="button" role="tab" aria-selected="false" class="tab-btn rounded-full py-3 text-sm font-semibold text-black/50">
+          Legs
+        </button>
+      </div>
+
+      <section class="mb-8 md:mb-10 pb-8 md:pb-10 border-b border-black/10">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase tracking-[0.15em] text-black/50 mb-3">Today&rsquo;s session</p>
+            <h2 class="font-grotesk font-bold text-4xl md:text-5xl tracking-tight leading-none mb-3">Push Day A</h2>
+            <p class="text-sm text-black/60">6 exercises &middot; about 45 min</p>
+          </div>
+          <div class="flex items-center gap-2 shrink-0 pt-1">
+            <button type="button" aria-label="Shuffle workout variation" class="icon-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 6h3.2c2.1 0 3.3 1.2 4.4 2.6L14 15c1 1.3 2.3 2.6 4.4 2.6H21"/>
+                <path d="M18 3l3 3-3 3"/>
+                <path d="M2 18h3.2c2.1 0 3.3-1.2 4.4-2.6"/>
+                <path d="M18 21l3-3-3-3"/>
+              </svg>
+            </button>
+            <button type="button" aria-label="Next workout variation" class="icon-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Exercise list">
+        <ul class="divide-y divide-black/10">
+
+          <li class="py-5 md:py-6 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4 min-w-0">
+              <span class="font-grotesk font-bold text-2xl md:text-3xl text-black/15 leading-none w-9 shrink-0 tabular-nums">01</span>
+              <div class="min-w-0">
+                <p class="font-grotesk font-bold text-lg md:text-xl tracking-tight mb-1">Bench Press</p>
+                <p class="text-sm text-black/60">4 sets &times; 8&ndash;10 reps &middot; RIR 0&ndash;1</p>
+              </div>
+            </div>
+            <button type="button" aria-label="Preview Bench Press demo" class="icon-btn shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+            </button>
+          </li>
+
+          <li class="py-5 md:py-6 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4 min-w-0">
+              <span class="font-grotesk font-bold text-2xl md:text-3xl text-black/15 leading-none w-9 shrink-0 tabular-nums">02</span>
+              <div class="min-w-0">
+                <p class="font-grotesk font-bold text-lg md:text-xl tracking-tight mb-1">Overhead Press</p>
+                <p class="text-sm text-black/60">3 sets &times; 8&ndash;10 reps &middot; RIR 1</p>
+              </div>
+            </div>
+            <button type="button" aria-label="Preview Overhead Press demo" class="icon-btn shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+            </button>
+          </li>
+
+          <li class="py-5 md:py-6 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4 min-w-0">
+              <span class="font-grotesk font-bold text-2xl md:text-3xl text-black/15 leading-none w-9 shrink-0 tabular-nums">03</span>
+              <div class="min-w-0">
+                <p class="font-grotesk font-bold text-lg md:text-xl tracking-tight mb-1">Incline Dumbbell Press</p>
+                <p class="text-sm text-black/60">3 sets &times; 10&ndash;12 reps &middot; RIR 1&ndash;2</p>
+              </div>
+            </div>
+            <button type="button" aria-label="Preview Incline Dumbbell Press demo" class="icon-btn shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+            </button>
+          </li>
+
+          <li class="py-5 md:py-6 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4 min-w-0">
+              <span class="font-grotesk font-bold text-2xl md:text-3xl text-black/15 leading-none w-9 shrink-0 tabular-nums">04</span>
+              <div class="min-w-0">
+                <p class="font-grotesk font-bold text-lg md:text-xl tracking-tight mb-1">Lateral Raise</p>
+                <p class="text-sm text-black/60">3 sets &times; 12&ndash;15 reps &middot; RIR 0&ndash;1</p>
+              </div>
+            </div>
+            <button type="button" aria-label="Preview Lateral Raise demo" class="icon-btn shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+            </button>
+          </li>
+
+          <li class="py-5 md:py-6 flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4 min-w-0">
+              <span class="font-grotesk font-bold text-2xl md:text-3xl text-black/15 leading-none w-9 shrink-0 tabular-nums">05</span>
+              <div class="min-w-0">
+                <p class="font-grotesk font-bold text-lg md:text-xl tracking-tight mb-1">Triceps Pushdown</p>
+                <p class="text-sm text-black/60">3 sets &times; 12&ndash;15 reps &middot; RIR 0</p>
+              </div>
+            </div>
+            <button type="button" aria-label="Preview Triceps Pushdown demo" class="icon-btn shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+            </button>
+          </li>
+
+          <li class="py-5 md:py-6 flex items-start justify-between gap-4">
+            <button type="button" class="pace-row flex items-start gap-4 min-w-0 text-left flex-1" aria-label="Incline Treadmill Walk, tap for pace guide">
+              <span class="font-grotesk font-bold text-2xl md:text-3xl text-black/15 leading-none w-9 shrink-0 tabular-nums">06</span>
+              <div class="min-w-0">
+                <p class="font-grotesk font-bold text-lg md:text-xl tracking-tight mb-1">Incline Treadmill Walk</p>
+                <p class="text-sm text-black/60 mb-2">12 min &middot; Zone 2 finisher</p>
+                <span class="pace-badge inline-flex items-center gap-1.5 rounded-full border border-black/20 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-black/70">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M12 7v5l3.5 2"/>
+                  </svg>
+                  Tap for pace guide
+                </span>
+              </div>
+            </button>
+            <button type="button" aria-label="Preview Incline Treadmill Walk demo" class="icon-btn shrink-0">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5.5v13l11-6.5-11-6.5z"/></svg>
+            </button>
+          </li>
+
+        </ul>
+      </section>
+    </main>
+
+    <div class="fixed bottom-0 inset-x-0 z-30 bg-white/90 backdrop-blur border-t border-black/10">
+      <div class="max-w-2xl mx-auto px-4 md:px-8 py-4 md:py-5 flex items-center gap-3">
+        <button type="button" class="cta-primary flex-1 rounded-full text-white font-semibold text-base py-4" style="background: var(--accent);">
+          Start
+        </button>
+        <button type="button" class="cta-ghost rounded-full border border-black/25 text-black font-semibold text-base py-4 px-6">
+          Install App
+        </button>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
