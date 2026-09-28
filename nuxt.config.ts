@@ -1,4 +1,5 @@
 const SITE_URL = "https://workout.itsash.in";
+const GA_ID = "G-Z6HTBE0K9R";
 
 export default defineNuxtConfig({
   srcDir: "src/",
@@ -88,6 +89,13 @@ export default defineNuxtConfig({
         { rel: "apple-touch-icon", sizes: "192x192", href: "icon-192.svg" },
       ],
       script: [
+        {
+          src: `https://www.googletagmanager.com/gtag/js?id=${GA_ID}`,
+          async: true,
+        },
+        {
+          innerHTML: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`,
+        },
         {
           type: "application/ld+json",
           innerHTML: JSON.stringify({
