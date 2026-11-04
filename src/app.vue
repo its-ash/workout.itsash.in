@@ -281,7 +281,12 @@
       class="modal-overlay"
       @click.self="showStretchingModal = false"
     >
-      <div class="modal-content stretching-modal">
+      <div
+        class="modal-content stretching-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Full Body Stretching Routine"
+      >
         <div class="modal-header">
           <h2>Full Body Stretching Routine</h2>
           <button
@@ -356,7 +361,12 @@
       class="modal-overlay"
       @click.self="closeGifModal"
     >
-      <div class="modal-content gif-modal">
+      <div
+        class="modal-content gif-modal"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="activeGif?.name"
+      >
         <div class="modal-header">
           <h2>{{ activeGif?.name }}</h2>
           <button
@@ -417,7 +427,12 @@
       class="modal-overlay"
       @click.self="cancelStopSession"
     >
-      <div class="modal-content session-timer-modal">
+      <div
+        class="modal-content session-timer-modal"
+        role="alertdialog"
+        aria-modal="true"
+        aria-label="Stop Workout Session?"
+      >
         <div class="modal-header">
           <h2>Stop Workout Session?</h2>
           <button
@@ -468,7 +483,12 @@
       class="modal-overlay"
       @click.self="closeRunTimer"
     >
-      <div class="modal-content run-timer-modal">
+      <div
+        class="modal-content run-timer-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Run/Walk Interval Timer"
+      >
         <div class="modal-header">
           <h2>Run/Walk Interval Timer</h2>
           <button
@@ -512,21 +532,6 @@
             </p>
           </div>
 
-          <div class="run-timer-controls">
-            <button
-              class="btn-primary"
-              @click="toggleRunTimer"
-            >
-              {{ isRunTimerActive ? "Pause" : (runTimerElapsed > 0 ? "Resume" : "Start") }}
-            </button>
-            <button
-              class="btn-outline"
-              @click="resetRunTimer"
-            >
-              Reset
-            </button>
-          </div>
-
           <ul class="run-segment-list">
             <li
               v-for="(seg, i) in runIntervalPlan"
@@ -542,11 +547,25 @@
 
         <div class="modal-footer">
           <button
-            class="btn-primary"
+            class="btn-outline"
             @click="closeRunTimer"
           >
             Done
           </button>
+          <div class="run-timer-controls">
+            <button
+              class="btn-outline"
+              @click="resetRunTimer"
+            >
+              Reset
+            </button>
+            <button
+              class="btn-primary"
+              @click="toggleRunTimer"
+            >
+              {{ isRunTimerActive ? "Pause" : (runTimerElapsed > 0 ? "Resume" : "Start") }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -556,7 +575,12 @@
       class="modal-overlay"
       @click.self="closeTreadmill"
     >
-      <div class="modal-content treadmill-modal run-timer-modal">
+      <div
+        class="modal-content treadmill-modal run-timer-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Interval Walking Training"
+      >
         <div class="modal-header">
           <h2>Interval Walking Training</h2>
           <button
@@ -627,22 +651,6 @@
               </div>
             </div>
           </div>
-
-          <div class="run-timer-controls">
-            <button
-              class="btn-primary"
-              @click="toggleTreadmill"
-            >
-              {{ isTreadmillActive ? "Pause" : (treadmillElapsed > 0 ? "Resume" : "Start") }}
-            </button>
-            <button
-              v-if="treadmillElapsed > 0"
-              class="btn-outline"
-              @click="resetTreadmill"
-            >
-              Reset
-            </button>
-          </div>
         </div>
 
         <div class="treadmill-scroll">
@@ -661,11 +669,26 @@
 
         <div class="modal-footer">
           <button
-            class="btn-primary"
+            class="btn-outline"
             @click="closeTreadmill"
           >
             Done
           </button>
+          <div class="run-timer-controls">
+            <button
+              v-if="treadmillElapsed > 0"
+              class="btn-outline"
+              @click="resetTreadmill"
+            >
+              Reset
+            </button>
+            <button
+              class="btn-primary"
+              @click="toggleTreadmill"
+            >
+              {{ isTreadmillActive ? "Pause" : (treadmillElapsed > 0 ? "Resume" : "Start") }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
