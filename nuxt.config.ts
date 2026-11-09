@@ -130,7 +130,7 @@ export default defineNuxtConfig({
     injectRegister: "auto",
     registerType: "autoUpdate",
     client: {
-      installPrompt: false,
+      installPrompt: true,
       periodicSyncForUpdates: 3600,
     },
     manifest: {
@@ -164,9 +164,6 @@ export default defineNuxtConfig({
       cleanupOutdatedCaches: true,
       globPatterns: ["**/*.{js,css,html,png,svg,ico,txt,woff2}"],
       navigateFallback: "/",
-    },
-    client: {
-      installPrompt: true,
     },
     devOptions: {
       enabled: true,

@@ -1,13 +1,26 @@
 import type { WorkoutSession } from './types'
 
-const CORE = [
-  'Cable Crunch - 3 sets x 10-15 reps, RIR 0-1, rest 60s, full spinal flexion',
-  'Hanging Leg Raise - 3 sets x 8-12 reps, RIR 0-1, rest 60s, control the descent',
-  'Machine Crunch - 3 sets x 10-15 reps, RIR 0-1, rest 60s, add load weekly',
-  'Cable Twist - 3 sets x 10-15 reps each side, RIR 1, rest 60s',
-  'Cable Reverse Crunch - 3 sets x 10-15 reps, RIR 0-1, rest 60s',
-  'Pallof Press - 3 sets x 10-12 reps each side, RIR 2, rest 45s',
-] as const
+const ABS = {
+  cableCrunch: 'Cable Crunch - 3 sets x 10-15 reps, RIR 0-1, rest 60s, full spinal flexion',
+  hangingLegRaise: 'Hanging Leg Raise - 3 sets x 8-12 reps, RIR 0-1, rest 60s, control the descent',
+  machineCrunch: 'Machine Crunch - 3 sets x 10-15 reps, RIR 0-1, rest 60s, add load weekly',
+  cableReverseCrunch: 'Cable Reverse Crunch - 3 sets x 10-15 reps, RIR 0-1, rest 60s',
+  reverseCrunch: 'Reverse Crunch - 3 sets x 12-20 reps, RIR 0-1, rest 60s, curl hips off the floor',
+} as const
+
+const OBLIQUES = {
+  cableTwist: 'Cable Twist - 3 sets x 10-15 reps each side, RIR 1, rest 45s, rotate through the ribs',
+  pallofPress: 'Pallof Press - 3 sets x 10-12 reps each side, RIR 2, rest 45s',
+  cableSideBend: 'Cable Side Bend - 3 sets x 12-15 reps each side, RIR 1, rest 45s, full stretch at top',
+  hangingObliqueKneeRaise: 'Hanging Oblique Knee Raise - 3 sets x 8-12 reps each side, RIR 1, rest 45s',
+  dumbbellSideBend: 'Dumbbell Side Bend - 3 sets x 12-15 reps each side, RIR 1, rest 45s, full stretch at top',
+  russianTwist: 'Weighted Russian Twist - 3 sets x 12-20 reps each side, RIR 1, rest 45s',
+} as const
+
+const SERRATUS = {
+  pullover: 'Dumbbell Pullover - 2 sets x 10-15 reps, RIR 1, rest 90s, deep stretch overhead',
+  pushUpPlus: 'Push-up Plus - 2 sets x 12-15 reps, RIR 1, rest 60s, spread shoulder blades at top',
+} as const
 
 const FINISHER = 'Run/Walk Interval Protocol - 10 min, run/walk intervals'
 
@@ -22,7 +35,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Cable Standing Fly - 3 sets x 10-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Cable Lateral Raise - 4 sets x 12-20 reps, RIR 0-1, rest 60s',
       'Overhead Cable Triceps Extension - 3 sets x 10-15 reps, RIR 0-1, rest 90s, full stretch behind head',
-      CORE[0],
+      SERRATUS.pullover,
+      ABS.cableCrunch,
+      OBLIQUES.cableTwist,
       FINISHER,
     ],
   },
@@ -36,7 +51,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Cable Incline Fly - 3 sets x 12-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Dumbbell Lateral Raise - 4 sets x 12-20 reps, RIR 0-1, rest 60s',
       'Skull Crusher - 3 sets x 8-12 reps, RIR 0-1, rest 90s, lower bar behind head',
-      CORE[1],
+      SERRATUS.pushUpPlus,
+      ABS.hangingLegRaise,
+      OBLIQUES.cableSideBend,
       FINISHER,
     ],
   },
@@ -50,7 +67,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Cable Lateral Raise - 4 sets x 12-20 reps, RIR 0-1, rest 60s, last set lengthened partials',
       'Reverse Pec Deck - 3 sets x 15-20 reps, RIR 0-1, rest 60s',
       'Overhead Dumbbell Extension - 3 sets x 10-15 reps, RIR 0-1, rest 90s, full stretch behind head',
-      CORE[2],
+      SERRATUS.pullover,
+      ABS.machineCrunch,
+      OBLIQUES.pallofPress,
       FINISHER,
     ],
   },
@@ -65,6 +84,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Machine Lateral Raise - 4 sets x 12-20 reps, RIR 0-1, rest 60s',
       'Overhead Cable Triceps Extension - 3 sets x 10-15 reps, RIR 0-1, rest 90s, full stretch behind head',
       'Rope Triceps Pushdown - 2 sets x 12-15 reps, RIR 0, rest 60s',
+      SERRATUS.pushUpPlus,
+      ABS.machineCrunch,
+      OBLIQUES.cableTwist,
       FINISHER,
     ],
   },
@@ -78,7 +100,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Dumbbell Incline Fly - 3 sets x 10-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Seated Dumbbell Lateral Raise - 4 sets x 12-20 reps, RIR 0-1, rest 60s',
       'Overhead Dumbbell Extension - 3 sets x 10-15 reps, RIR 0-1, rest 90s, full stretch behind head',
-      'Push-up - 2 sets x AMRAP, RIR 0, rest 90s, hands on handles for depth',
+      'Push-up Plus - 2 sets x AMRAP, RIR 0, rest 90s, spread shoulder blades at top',
+      ABS.reverseCrunch,
+      OBLIQUES.russianTwist,
       FINISHER,
     ],
   },
@@ -93,6 +117,8 @@ export const workoutSessions: WorkoutSession[] = [
       'Cable Standing Fly - 3 sets x 12-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Cable Lateral Raise - 4 sets x 15-20 reps, RIR 0-1, rest 60s',
       'Overhead Cable Triceps Extension - 3 sets x 10-15 reps, RIR 0-1, rest 90s, full stretch behind head',
+      ABS.cableReverseCrunch,
+      OBLIQUES.hangingObliqueKneeRaise,
       FINISHER,
     ],
   },
@@ -107,7 +133,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Face Pulls - 3 sets x 15-20 reps, RIR 0-1, rest 60s',
       'Barbell Preacher Curl - 3 sets x 8-12 reps, RIR 0-1, rest 90s, full extension at bottom',
       'Dumbbell Hammer Curl - 2 sets x 10-15 reps, RIR 0-1, rest 60s',
-      CORE[3],
+      ABS.cableReverseCrunch,
+      OBLIQUES.cableTwist,
+      FINISHER,
     ],
   },
   {
@@ -121,7 +149,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Reverse Pec Deck - 3 sets x 15-20 reps, RIR 0-1, rest 60s',
       'Incline Dumbbell Curl - 3 sets x 8-12 reps, RIR 0-1, rest 90s, arms hang behind torso',
       'Cable Rope Hammer Curl - 2 sets x 12-15 reps, RIR 0-1, rest 60s',
-      CORE[0],
+      ABS.cableCrunch,
+      OBLIQUES.cableSideBend,
+      FINISHER,
     ],
   },
   {
@@ -135,7 +165,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Barbell Shrug - 3 sets x 10-15 reps, RIR 0-1, rest 90s, 1s pause at top',
       'EZ Bar Preacher Curl - 3 sets x 8-12 reps, RIR 0-1, rest 90s, full extension at bottom',
       'Reverse Cable Curl - 2 sets x 12-15 reps, RIR 0-1, rest 60s',
-      CORE[1],
+      ABS.hangingLegRaise,
+      OBLIQUES.pallofPress,
+      FINISHER,
     ],
   },
   {
@@ -148,7 +180,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Seated Cable Row - 3 sets x 8-12 reps, RIR 1-2, rest 120s, reach forward at bottom',
       'Face Pulls - 3 sets x 15-20 reps, RIR 0-1, rest 60s',
       'Barbell Preacher Curl - 3 sets x 8-10 reps, RIR 0-1, rest 90s, full extension at bottom',
-      CORE[2],
+      ABS.machineCrunch,
+      OBLIQUES.pallofPress,
+      FINISHER,
     ],
   },
   {
@@ -162,7 +196,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Barbell Shrug - 3 sets x 10-15 reps, RIR 0-1, rest 90s, 1s pause at top',
       'Machine Preacher Curl - 3 sets x 10-12 reps, RIR 0-1, rest 90s, full extension at bottom',
       'Cable Rope Hammer Curl - 3 sets x 12-15 reps, RIR 0-1, rest 60s',
-      CORE[4],
+      ABS.cableReverseCrunch,
+      OBLIQUES.cableSideBend,
+      FINISHER,
     ],
   },
   {
@@ -176,7 +212,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Dumbbell Shrug - 3 sets x 12-15 reps, RIR 0-1, rest 90s, 1s pause at top',
       'Dumbbell Preacher Curl - 3 sets x 8-12 reps, RIR 0-1, rest 90s, full extension at bottom',
       'Dumbbell Hammer Curl - 3 sets x 10-12 reps, RIR 0-1, rest 60s',
-      CORE[5],
+      ABS.reverseCrunch,
+      OBLIQUES.dumbbellSideBend,
+      FINISHER,
     ],
   },
   {
@@ -189,7 +227,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Leg Extension - 3 sets x 10-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Seated Leg Curl - 3 sets x 10-15 reps, RIR 0-1, rest 90s',
       'Standing Calf Raise - 4 sets x 10-15 reps, RIR 0-1, rest 60s, 2s pause at bottom stretch',
-      CORE[0],
+      ABS.cableCrunch,
+      OBLIQUES.pallofPress,
+      FINISHER,
     ],
   },
   {
@@ -203,7 +243,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Seated Leg Curl - 3 sets x 10-15 reps, RIR 0-1, rest 90s',
       'Seated Hip Abduction - 3 sets x 12-20 reps, RIR 0-1, rest 60s, lean torso forward',
       'Standing Calf Raise - 3 sets x 10-15 reps, RIR 0-1, rest 60s, 2s pause at bottom stretch',
-      CORE[2],
+      ABS.machineCrunch,
+      OBLIQUES.cableTwist,
+      FINISHER,
     ],
   },
   {
@@ -217,7 +259,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Leg Extension - 3 sets x 12-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Seated Leg Curl - 2 sets x 12-15 reps, RIR 0-1, rest 90s',
       'Standing Calf Raise - 4 sets x 10-15 reps, RIR 0-1, rest 60s, 2s pause at bottom stretch',
-      CORE[1],
+      ABS.hangingLegRaise,
+      OBLIQUES.cableSideBend,
+      FINISHER,
     ],
   },
   {
@@ -231,7 +275,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Seated Leg Curl - 4 sets x 10-15 reps, RIR 0-1, rest 90s',
       'Hyperextension - 3 sets x 10-15 reps, RIR 1, rest 90s, round through hips not spine',
       'Calf Press on Leg Press - 4 sets x 10-15 reps, RIR 0-1, rest 60s, 2s pause at bottom stretch',
-      CORE[4],
+      ABS.cableReverseCrunch,
+      OBLIQUES.cableTwist,
+      FINISHER,
     ],
   },
   {
@@ -245,7 +291,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Leg Extension - 3 sets x 12-15 reps, RIR 0-1, rest 90s, last set lengthened partials',
       'Seated Leg Curl - 3 sets x 12-15 reps, RIR 0-1, rest 90s',
       'Single Leg Standing Calf Raise - 3 sets x 12-15 reps each leg, RIR 0-1, rest 60s, 2s pause at bottom stretch',
-      CORE[3],
+      ABS.cableCrunch,
+      OBLIQUES.hangingObliqueKneeRaise,
+      FINISHER,
     ],
   },
   {
@@ -258,7 +306,9 @@ export const workoutSessions: WorkoutSession[] = [
       'Dumbbell Walking Lunge - 3 sets x 10-12 reps each leg, RIR 1-2, rest 90s, long stride',
       'Dumbbell Step-up - 3 sets x 10 reps each leg, RIR 1-2, rest 90s, knee-high box',
       'Dumbbell Calf Raise - 4 sets x 12-20 reps, RIR 0-1, rest 60s, 2s pause at bottom stretch',
-      CORE[5],
+      ABS.reverseCrunch,
+      OBLIQUES.russianTwist,
+      FINISHER,
     ],
   },
 ]

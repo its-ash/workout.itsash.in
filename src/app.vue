@@ -66,6 +66,7 @@
 
     <main class="page">
       <div
+        v-if="!isSessionActive"
         role="tablist"
         aria-label="Workout split"
         class="segmented"
@@ -94,7 +95,10 @@
             <p class="session-meta">
               {{ sessionMeta }}
             </p>
-            <div class="session-actions">
+            <div
+              v-if="!isSessionActive"
+              class="session-actions"
+            >
               <button
                 type="button"
                 class="icon-btn icon-btn-lg"

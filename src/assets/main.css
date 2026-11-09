@@ -226,10 +226,13 @@ h1 {
 }
 
 .content-grid {
-  margin-top: 1.25rem;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
+}
+
+.segmented + .content-grid {
+  margin-top: 1.25rem;
 }
 
 .card {
@@ -493,9 +496,12 @@ h2 {
   }
 
   .content-grid {
-    margin-top: 2rem;
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
     gap: 2rem;
+  }
+
+  .segmented + .content-grid {
+    margin-top: 2rem;
   }
 
   .session-col {
