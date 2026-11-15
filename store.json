@@ -1,0 +1,11 @@
+{
+  "id": "workout",
+  "name": "Workout",
+  "repo": "its-ash/workout.itsash.in",
+  "package": "com.itsash.workout",
+  "tagline": "Push/Pull/Legs gym planner with exercise demos and treadmill interval timers. Works offline.",
+  "description": "Workout is an evidence-based Push/Pull/Legs program for the gym. Pick a split and get one of six variations, each with sets, reps, RIR and rest times. Tap an exercise to see an animated demo with step-by-step instructions in English or Hindi. Start the session clock, and when you stop, export the workout to your calendar with a summary image you can keep or share. A run/walk finisher and a 20 minute interval walk timer show the treadmill speed and incline for every segment and beep before each change. There is also a full body stretching routine. Everything runs on your phone, with no account, no ads and no tracking.",
+  "category": "Health & Fitness",
+  "icon": "assets/icon/logo-1024.png",
+  "homepage": "https://workout.itsash.in/"
+}
