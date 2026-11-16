@@ -1,7 +1,7 @@
 name: workout
 description: "Workout: Push/Pull/Legs gym planner with exercise demos, a session timer and treadmill interval timers. Works offline."
 publish_to: 'none'
-version: 1.0.1+2
+version: 1.0.2+3
 
 environment:
   sdk: ^3.12.2
