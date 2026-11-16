@@ -1,9 +1,16 @@
 package com.itsash.workout
 
+import android.Manifest
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -27,6 +34,10 @@ import io.flutter.plugin.common.MethodChannel
  * - `saveImage {png, name}` -> where it was saved: `Pictures/Workout` in the
  *   gallery (Android 10+), or the app's own Pictures folder on older phones.
  * - `shareImage {png, name}`: share sheet through the FileProvider.
+ * - `showTimerNotification {id, title, text, base?, countDown}`: ongoing
+ *   notification whose clock Android ticks itself (chronometer), counting up
+ *   from or down to `base` (epoch ms). No `base` = no clock (paused).
+ * - `cancelNotification(id)`.
  */
 class MainActivity : FlutterActivity() {
     private var tone: ToneGenerator? = null
@@ -80,6 +91,20 @@ class MainActivity : FlutterActivity() {
                         shareImage(png, name)
                         result.success(null)
                     }
+                }
+                "showTimerNotification" -> {
+                    showTimerNotification(
+                        id = call.argument<Number>("id")?.toInt() ?: 1,
+                        title = call.argument<String>("title") ?: "Workout",
+                        text = call.argument<String>("text") ?: "",
+                        base = call.argument<Number>("base")?.toLong(),
+                        countDown = call.argument<Boolean>("countDown") ?: false,
+                    )
+                    result.success(null)
+                }
+                "cancelNotification" -> {
+                    (call.arguments as? Number)?.toInt()?.let { notifications().cancel(it) }
+                    result.success(null)
                 }
                 else -> result.notImplemented()
             }
@@ -154,13 +179,62 @@ class MainActivity : FlutterActivity() {
         startActivity(Intent.createChooser(send, "Share workout"))
     }
 
+    private fun notifications() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    private var askedPermission = false
+
+    private fun showTimerNotification(id: Int, title: String, text: String, base: Long?, countDown: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            if (!askedPermission) {
+                askedPermission = true
+                requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 7)
+            }
+            return
+        }
+        val manager = notifications()
+        if (manager.getNotificationChannel(TIMER_CHANNEL) == null) {
+            manager.createNotificationChannel(
+                NotificationChannel(TIMER_CHANNEL, "Workout timer", NotificationManager.IMPORTANCE_LOW).apply {
+                    description = "Session clock and interval walk timer"
+                    setShowBadge(false)
+                },
+            )
+        }
+        val open = PendingIntent.getActivity(
+            this,
+            0,
+            Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val builder = Notification.Builder(this, TIMER_CHANNEL)
+            .setSmallIcon(R.drawable.ic_stat_workout)
+            .setContentTitle(title)
+            .setContentText(text)
+            .setContentIntent(open)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setCategory(Notification.CATEGORY_STOPWATCH)
+            .setVisibility(Notification.VISIBILITY_PUBLIC)
+        if (base != null) {
+            builder.setWhen(base).setShowWhen(true).setUsesChronometer(true).setChronometerCountDown(countDown)
+        } else {
+            builder.setShowWhen(false)
+        }
+        manager.notify(id, builder.build())
+    }
+
     override fun onDestroy() {
         tone?.release()
         tone = null
+        // Notifications stay: their clocks are wall-clock based, like the
+        // session and timer state, so they stay right after the app closes.
         super.onDestroy()
     }
 
     private companion object {
         const val CHANNEL = "com.itsash.workout/platform"
+        const val TIMER_CHANNEL = "timer"
     }
 }

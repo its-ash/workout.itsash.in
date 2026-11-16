@@ -10,12 +10,18 @@ import 'screens/home_screen.dart';
 import 'state/interval_timer.dart';
 import 'state/workout_store.dart';
 
-/// Brand accent: the web app's lime, darkened so it reads on light surfaces.
-const workoutAccent = Color(0xFF4D7C0F);
+/// Brand accent: gold. Workout is a dark app (black background, gold accent).
+const workoutAccent = Color(0xFFD4AF37);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  // One-time move to the dark gold look: forget an older saved Light/System
+  // choice so the new dark default shows. Later choices in Settings stick.
+  if (!(prefs.getBool('dark_gold_v1') ?? false)) {
+    await prefs.remove(UiAppearance.key);
+    await prefs.setBool('dark_gold_v1', true);
+  }
   const platform = MethodChannelPlatform();
   final state = AppState(
     store: await WorkoutStore.load(),
@@ -37,6 +43,9 @@ class WorkoutApp extends StatelessWidget {
     return UiApp(
       title: 'Workout',
       accent: workoutAccent,
+      // Exception to the workspace's light default: Workout starts dark. The
+      // user can still pick Light or System in Settings.
+      themeMode: ThemeMode.dark,
       home: HomeScreen(state: state),
     );
   }

@@ -13,8 +13,12 @@ Stop & export to Calendar). Export opens `SessionCompleteSheet`: it renders
 `RepaintBoundary`, saves it to `Pictures/Workout` (MediaStore), then opens the
 calendar insert with the image's location in the description. Calendar insert
 intents cannot attach files, so the image itself is in the gallery; Share sends
-it anywhere (FileProvider, `res/xml/file_paths.xml`). App bar: stretching routine sheet, interval walk timer
-sheet, Settings. The run/walk row in every session opens the run/walk timer.
+it anywhere (FileProvider, `res/xml/file_paths.xml`). App bar: stretching routine sheet, interval walk timer,
+Settings. The run/walk row in every session opens the run/walk timer.
+While a session runs, `_CurrentExercise` replaces the session card: a big demo,
+name and plan, Completed (next exercise) and Previous; rows show done /
+current. Interval timers open full screen (`IntervalTimerDialog`, huge clock,
+speed and incline for treadmill use).
 
 ## Code layout
 
@@ -30,16 +34,25 @@ sheet, Settings. The run/walk row in every session opens the run/walk timer.
     `tool/import_web.dart`, not at runtime.
 - `lib/data/demos.dart`: `DemoLibrary` over `assets/data/demos.json`, keyed
   `<split>|<exercise name>` (the matcher depends on the split).
-- `lib/state/`: `WorkoutStore` (split, variation, session start time, all in
-  `shared_preferences`) and `IntervalTimer` (wall-clock anchor in prefs, beeps
-  once a second in the last 5 s of a segment). Both take a `now` for tests.
+- `lib/state/`: `WorkoutStore` (split, variation, session start time, current
+  exercise index, all in `shared_preferences`) and `IntervalTimer` (wall-clock
+  anchor in prefs, beeps once a second in the last 5 s of a segment). Both take
+  a `now` for tests. `LiveStatus` mirrors them to ongoing notifications (id 1
+  session, counting up with the current exercise; id 2 interval timer,
+  counting down with speed and incline) and to keep-screen-on. It only calls
+  the platform when the visible text changes; Android ticks the clocks.
 - `lib/platform/platform_channel.dart` + `MainActivity.kt`: channel
   `com.itsash.workout/platform`: `beep` (ToneGenerator, alarm stream),
   `keepScreenOn`, `addToCalendar` (ACTION_INSERT on CalendarContract, falls
-  back to the Google Calendar web URL), `saveImage`, `shareImage`.
+  back to the Google Calendar web URL), `saveImage`, `shareImage`,
+  `showTimerNotification` (chronometer notification, channel `timer`, icon
+  `drawable/ic_stat_workout`, asks POST_NOTIFICATIONS on Android 13+),
+  `cancelNotification`.
 - `lib/screens/`, `lib/widgets/`: UI from the shared theme only. GIFs sit on a
-  white tile (`DemoGif`) in both modes. Accent `0xFF4D7C0F` (the web's lime,
-  darkened for light mode); the icon uses the web's `#C8FF4D` on `#111411`.
+  white tile (`DemoGif`) in both modes. Gold accent `0xFFD4AF37` and dark mode
+  by default (`themeMode: ThemeMode.dark` in `main.dart`, the user's request,
+  an exception to the workspace light default); the icon uses the web's
+  `#C8FF4D` on `#111411`.
 
 ## Demo assets
 
@@ -51,10 +64,12 @@ line has no demo or a GIF is missing or unused.
 
 ## Behaviour notes
 
-- Closing a timer sheet pauses that timer (as in the web app). A timer still
-  running from a killed app reopens its sheet on start.
+- Closing the timer dialog does NOT pause it (changed from the web app on the
+  user's request): it keeps running, with a home-screen banner
+  (`UiPromoBanner`) and a notification. Pause / Reset are in the dialog.
 - The split picker, shuffle and next are disabled while a session runs.
-- Screen stays on during a session and while a timer sheet is open.
+- Screen stays on during a session, while a timer runs, and while its dialog
+  is open.
 
 ## Commands
 

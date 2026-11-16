@@ -24,6 +24,28 @@ abstract class WorkoutPlatform {
 
   /// Opens the Android share sheet with a PNG.
   Future<void> shareImage(Uint8List png, String fileName);
+
+  /// Shows (or updates) the ongoing notification [id] with a live clock that
+  /// Android ticks by itself: counting up from [baseMs] (a past wall-clock
+  /// time), or down to [baseMs] (a future one) when [countDown]. A null
+  /// [baseMs] shows no clock (paused). Asks for the notification permission
+  /// the first time on Android 13+.
+  Future<void> showTimerNotification({
+    required int id,
+    required String title,
+    required String text,
+    int? baseMs,
+    bool countDown = false,
+  });
+
+  /// Removes notification [id].
+  Future<void> cancelNotification(int id);
+}
+
+/// Notification ids.
+abstract final class WorkoutNotifications {
+  static const session = 1;
+  static const interval = 2;
 }
 
 class MethodChannelPlatform implements WorkoutPlatform {
@@ -76,6 +98,19 @@ class MethodChannelPlatform implements WorkoutPlatform {
 
   @override
   Future<void> shareImage(Uint8List png, String fileName) => _call('shareImage', {'png': png, 'name': fileName});
+
+  @override
+  Future<void> showTimerNotification({
+    required int id,
+    required String title,
+    required String text,
+    int? baseMs,
+    bool countDown = false,
+  }) =>
+      _call('showTimerNotification', {'id': id, 'title': title, 'text': text, 'base': baseMs, 'countDown': countDown});
+
+  @override
+  Future<void> cancelNotification(int id) => _call('cancelNotification', id);
 }
 
 /// The web app's export link: a prefilled Google Calendar event.

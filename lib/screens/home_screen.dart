@@ -4,16 +4,21 @@ import 'package:theme/theme.dart';
 import '../app_state.dart';
 import '../core/plan.dart';
 import '../core/sessions.dart';
+import '../state/interval_timer.dart';
+import '../state/live_status.dart';
 import '../widgets/demo_gif.dart';
 import '../widgets/session_summary_card.dart';
 import 'exercise_sheet.dart';
-import 'interval_timer_sheet.dart';
+import 'interval_timer_dialog.dart';
 import 'session_complete_sheet.dart';
 import 'settings_screen.dart';
 import 'stretching_sheet.dart';
 
 /// Today's session: split picker, the chosen variation and its exercises.
-/// The bottom bar starts and stops the session clock.
+/// The bottom bar starts and stops the session clock. While a session runs,
+/// the current exercise is shown big on top with a Completed button that
+/// moves to the next one. A running interval timer shows as a banner that
+/// reopens its full-screen dialog.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.state});
 
@@ -25,28 +30,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   AppState get _s => widget.state;
+  late final LiveStatus _live;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _s.store.addListener(_syncScreenOn);
-    _syncScreenOn();
-    // A timer that was running when the app was closed: show it again.
-    final running = [_s.runWalk, _s.intervalWalk].where((t) => t.running).firstOrNull;
-    if (running != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          IntervalTimerSheet.show(context, running, _s.platform, keepScreenOnAfter: _s.store.isActive);
-        }
-      });
-    }
+    _live = LiveStatus(store: _s.store, timers: [_s.runWalk, _s.intervalWalk], platform: _s.platform);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _s.store.removeListener(_syncScreenOn);
+    _live.dispose();
     super.dispose();
   }
 
@@ -55,18 +51,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (state == AppLifecycleState.resumed) {
       _s.runWalk.sync();
       _s.intervalWalk.sync();
+      // Also covers coming back from the notification permission prompt.
+      _live.resend();
     }
   }
 
-  bool? _screenOn;
-
-  /// The screen stays on during a session, so the clock is always in view.
-  void _syncScreenOn() {
-    final on = _s.store.isActive;
-    if (on == _screenOn) return;
-    _screenOn = on;
-    _s.platform.keepScreenOn(on);
-  }
+  void _openTimer(IntervalTimer timer) => IntervalTimerDialog.show(context, timer, _live);
 
   Future<void> _stop() async {
     final store = _s.store;
@@ -102,11 +92,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final store = _s.store;
     return ListenableBuilder(
-      listenable: store,
+      listenable: Listenable.merge([store, _s.runWalk, _s.intervalWalk]),
       builder: (context, _) {
         final session = store.session;
         final active = store.isActive;
         final lines = session.workout.map(WorkoutLine.parse).toList();
+        final timer =
+            [_s.runWalk, _s.intervalWalk].where((t) => t.running).firstOrNull ??
+            [_s.runWalk, _s.intervalWalk].where((t) => t.elapsed > 0 && !t.finished).firstOrNull;
         return UiScaffold(
           appBar: UiAppBar(
             title: 'Workout',
@@ -119,8 +112,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               UiIconButton(
                 Icons.directions_walk_rounded,
                 tooltip: 'Interval walk timer',
-                onPressed: () =>
-                    IntervalTimerSheet.show(context, _s.intervalWalk, _s.platform, keepScreenOnAfter: store.isActive),
+                onPressed: () => _openTimer(_s.intervalWalk),
               ),
               UiIconButton(
                 Icons.settings_rounded,
@@ -159,6 +151,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             gap: UiSpace.lg,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (timer != null)
+                UiPromoBanner(
+                  title: '${timer.plan.title} · ${shortClock(timer.remaining)}',
+                  subtitle: timer.running
+                      ? '${timer.segment.speed} · ${timer.segment.incline}'
+                      : 'Paused · tap to open',
+                  icon: timer.running ? Icons.directions_walk_rounded : Icons.pause_rounded,
+                  onTap: () => _openTimer(timer),
+                ),
               if (!active)
                 UiSegmentedControl<SessionType>(
                   [for (final t in SessionType.values) UiSegment(t, label: t.label)],
@@ -166,25 +167,39 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   expand: true,
                   onChanged: store.selectType,
                 ),
-              _SessionCard(session: session, active: active, store: _s),
+              if (active)
+                _CurrentExercise(
+                  lines: lines,
+                  index: store.current,
+                  gif: store.allDone ? null : _s.demos.find(store.type, lines[store.current].name)?.gif,
+                  onComplete: store.completeCurrent,
+                  onPrevious: store.current > 0 ? store.previous : null,
+                  onOpenTimer: () => _openTimer(_s.runWalk),
+                  onOpenDemo: store.allDone ? null : () => _openDemo(lines[store.current]),
+                  onFinish: _stop,
+                )
+              else
+                _SessionCard(session: session, active: active, store: _s),
               UiSection(
-                title: 'Exercises',
+                title: active
+                    ? '${session.title} · ${store.current.clamp(0, lines.length)}/${lines.length} done'
+                    : 'Exercises',
                 child: UiColumn(
                   gap: UiSpace.sm,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (final line in lines)
+                    for (var i = 0; i < lines.length; i++)
                       _ExerciseRow(
-                        line: line,
-                        thumb: _s.demos.find(store.type, line.name)?.gif,
-                        onTap: line.isRunWalk
-                            ? () => IntervalTimerSheet.show(
-                                context,
-                                _s.runWalk,
-                                _s.platform,
-                                keepScreenOnAfter: store.isActive,
-                              )
-                            : () => _openDemo(line),
+                        line: lines[i],
+                        thumb: _s.demos.find(store.type, lines[i].name)?.gif,
+                        state: !active
+                            ? _RowState.idle
+                            : i < store.current
+                            ? _RowState.done
+                            : i == store.current
+                            ? _RowState.current
+                            : _RowState.upcoming,
+                        onTap: lines[i].isRunWalk ? () => _openTimer(_s.runWalk) : () => _openDemo(lines[i]),
                       ),
                   ],
                 ),
@@ -245,12 +260,136 @@ class _SessionCard extends StatelessWidget {
   }
 }
 
+/// The exercise being done, big enough to read from the bench: a large demo,
+/// the name and plan, and a Completed button that moves to the next one.
+class _CurrentExercise extends StatelessWidget {
+  const _CurrentExercise({
+    required this.lines,
+    required this.index,
+    required this.gif,
+    required this.onComplete,
+    required this.onPrevious,
+    required this.onOpenTimer,
+    required this.onOpenDemo,
+    required this.onFinish,
+  });
+
+  final List<WorkoutLine> lines;
+  final int index;
+  final String? gif;
+  final VoidCallback onComplete;
+  final VoidCallback? onPrevious;
+  final VoidCallback onOpenTimer;
+  final VoidCallback? onOpenDemo;
+  final VoidCallback onFinish;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final t = context.text;
+    if (index >= lines.length) {
+      return UiCard(
+        padding: const EdgeInsets.all(UiSpace.xl),
+        child: UiColumn(
+          gap: UiSpace.md,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(Icons.emoji_events_rounded, size: 64, color: c.accent),
+            Text('All exercises done', style: t.headlineMedium, textAlign: TextAlign.center),
+            Text('Great work. Stop the session to save it.', style: t.bodyLarge, textAlign: TextAlign.center),
+            UiButtonBar(expand: true, [
+              UiButton('Back', variant: UiButtonVariant.outline, size: UiSize.lg, onPressed: onPrevious),
+              UiButton('Finish', icon: Icons.stop_rounded, size: UiSize.lg, onPressed: onFinish),
+            ]),
+          ],
+        ),
+      );
+    }
+    final line = lines[index];
+    final isLast = index == lines.length - 1;
+    return UiCard(
+      padding: const EdgeInsets.all(UiSpace.lg),
+      child: UiColumn(
+        gap: UiSpace.md,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'EXERCISE ${index + 1} OF ${lines.length}',
+            style: t.titleSmall?.copyWith(color: c.accent, letterSpacing: 1.2),
+          ),
+          if (line.isRunWalk)
+            Container(
+              height: 180,
+              decoration: BoxDecoration(color: c.accentSoft, borderRadius: UiRadius.all(UiRadius.lg)),
+              child: Icon(Icons.directions_run_rounded, size: 96, color: c.accent),
+            )
+          else if (gif != null)
+            GestureDetector(
+              onTap: onOpenDemo,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 280, maxWidth: 360),
+                  child: DemoGif(gif!, radius: UiRadius.lg, semanticLabel: '${line.name} demo'),
+                ),
+              ),
+            ),
+          Text(line.name, style: t.headlineLarge),
+          Text(
+            line.plan,
+            style: t.titleLarge?.copyWith(color: c.textMuted, fontWeight: FontWeight.w400),
+          ),
+          if (line.isRunWalk)
+            UiButton(
+              'Open run/walk timer',
+              icon: Icons.timer_outlined,
+              variant: UiButtonVariant.soft,
+              size: UiSize.lg,
+              expand: true,
+              onPressed: onOpenTimer,
+            ),
+          Row(
+            children: [
+              UiIconButton(
+                Icons.undo_rounded,
+                tooltip: 'Previous exercise',
+                variant: UiButtonVariant.outline,
+                size: UiSize.lg,
+                onPressed: onPrevious,
+              ),
+              const SizedBox(width: UiSpace.sm),
+              Expanded(
+                child: UiButton(
+                  isLast ? 'Completed · finish' : 'Completed',
+                  icon: Icons.check_rounded,
+                  size: UiSize.lg,
+                  expand: true,
+                  onPressed: onComplete,
+                ),
+              ),
+            ],
+          ),
+          if (!isLast)
+            Text(
+              'Next: ${lines[index + 1].name}',
+              style: t.bodyLarge?.copyWith(color: c.textMuted),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+enum _RowState { idle, done, current, upcoming }
+
 class _ExerciseRow extends StatelessWidget {
-  const _ExerciseRow({required this.line, required this.thumb, required this.onTap});
+  const _ExerciseRow({required this.line, required this.thumb, required this.onTap, this.state = _RowState.idle});
 
   final WorkoutLine line;
   final String? thumb;
   final VoidCallback onTap;
+  final _RowState state;
 
   @override
   Widget build(BuildContext context) {
@@ -263,10 +402,12 @@ class _ExerciseRow extends StatelessWidget {
     } else {
       leading = UiIconBox(Icons.fitness_center_rounded, size: 56, color: colors.textSubtle);
     }
-    return UiCard(
+    final done = state == _RowState.done;
+    final card = UiCard(
       padding: const EdgeInsets.all(UiSpace.md),
       onTap: line.isRunWalk || thumb != null ? onTap : null,
-      semanticLabel: line.name,
+      selected: state == _RowState.current,
+      semanticLabel: done ? '${line.name}, done' : line.name,
       child: UiRow(
         gap: UiSpace.md,
         children: [
@@ -282,9 +423,13 @@ class _ExerciseRow extends StatelessWidget {
               ],
             ),
           ),
-          if (!line.isRunWalk && thumb != null) Icon(Icons.play_circle_outline_rounded, color: colors.accent),
+          if (done)
+            Icon(Icons.check_circle_rounded, color: colors.success)
+          else if (!line.isRunWalk && thumb != null)
+            Icon(Icons.play_circle_outline_rounded, color: colors.accent),
         ],
       ),
     );
+    return done ? Opacity(opacity: 0.55, child: card) : card;
   }
 }

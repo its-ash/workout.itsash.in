@@ -19,6 +19,7 @@ class WorkoutStore extends ChangeNotifier {
     final start = _prefs.getInt(_kStart);
     if (start != null) {
       _startedAt = DateTime.fromMillisecondsSinceEpoch(start);
+      _current = (_prefs.getInt(_kCurrent) ?? 0).clamp(0, session.workout.length);
       _startTicker();
     }
   }
@@ -26,6 +27,7 @@ class WorkoutStore extends ChangeNotifier {
   static const _kType = 'session_type';
   static const _kSession = 'session_id';
   static const _kStart = 'session_start_ms';
+  static const _kCurrent = 'session_current';
 
   final SharedPreferences _prefs;
   final Random _random;
@@ -34,6 +36,7 @@ class WorkoutStore extends ChangeNotifier {
   late SessionType _type;
   late String _sessionId;
   DateTime? _startedAt;
+  int _current = 0;
   Timer? _ticker;
 
   static Future<WorkoutStore> load() async => WorkoutStore._(await SharedPreferences.getInstance());
@@ -47,6 +50,31 @@ class WorkoutStore extends ChangeNotifier {
 
   bool get isActive => _startedAt != null;
   DateTime? get startedAt => _startedAt;
+
+  /// Index of the exercise being done in the running session. Equal to the
+  /// number of exercises once all are completed.
+  int get current => _current;
+
+  /// True when every exercise of the running session is completed.
+  bool get allDone => isActive && _current >= session.workout.length;
+
+  /// Marks the current exercise done and moves to the next one.
+  void completeCurrent() => _setCurrent(_current + 1);
+
+  /// Goes back to the previous exercise.
+  void previous() => _setCurrent(_current - 1);
+
+  /// Jumps to exercise [i] (tap on a row while a session runs).
+  void goTo(int i) => _setCurrent(i);
+
+  void _setCurrent(int i) {
+    if (!isActive) return;
+    final next = i.clamp(0, session.workout.length);
+    if (next == _current) return;
+    _current = next;
+    _prefs.setInt(_kCurrent, next);
+    notifyListeners();
+  }
 
   /// Seconds since Start.
   int get elapsed => _startedAt == null ? 0 : max(0, _now().difference(_startedAt!).inSeconds);
@@ -75,7 +103,9 @@ class WorkoutStore extends ChangeNotifier {
   void start() {
     if (isActive) return;
     _startedAt = _now();
+    _current = 0;
     _prefs.setInt(_kStart, _startedAt!.millisecondsSinceEpoch);
+    _prefs.setInt(_kCurrent, 0);
     _startTicker();
     notifyListeners();
   }
@@ -88,7 +118,9 @@ class WorkoutStore extends ChangeNotifier {
     _startedAt = null;
     _ticker?.cancel();
     _ticker = null;
+    _current = 0;
     _prefs.remove(_kStart);
+    _prefs.remove(_kCurrent);
     notifyListeners();
     return (begin: begin, end: end);
   }

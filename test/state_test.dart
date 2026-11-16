@@ -71,6 +71,34 @@ void main() {
       expect(WorkoutStore.forTest(prefs, now: clock).isActive, isFalse);
       restored.dispose();
     });
+
+    test('current exercise advances, goes back, persists and resets', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final s = WorkoutStore.forTest(prefs, now: clock);
+      s.completeCurrent();
+      expect(s.current, 0, reason: 'no session yet');
+      s.start();
+      s.completeCurrent();
+      s.completeCurrent();
+      expect(s.current, 2);
+      s.previous();
+      expect(s.current, 1);
+      s.dispose();
+
+      final restored = WorkoutStore.forTest(prefs, now: clock);
+      expect(restored.current, 1);
+      final n = restored.session.workout.length;
+      for (var i = 0; i < n + 3; i++) {
+        restored.completeCurrent();
+      }
+      expect(restored.current, n);
+      expect(restored.allDone, isTrue);
+      restored.stop();
+      expect(restored.current, 0);
+      restored.start();
+      expect(restored.current, 0);
+      restored.dispose();
+    });
   });
 
   group('IntervalTimer', () {
