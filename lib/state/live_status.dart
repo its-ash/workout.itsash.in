@@ -27,6 +27,8 @@ class LiveStatus {
 
   String? _sessionKey;
   String? _intervalKey;
+  bool _sessionSynced = false;
+  bool _intervalSynced = false;
   bool? _screenOn;
   int _openDialogs = 0;
 
@@ -62,10 +64,12 @@ class LiveStatus {
   void _syncSession() {
     final start = store.startedAt;
     if (start == null) {
-      if (_sessionKey != null) platform.cancelNotification(WorkoutNotifications.session);
+      if (!_sessionSynced || _sessionKey != null) platform.cancelNotification(WorkoutNotifications.session);
+      _sessionSynced = true;
       _sessionKey = null;
       return;
     }
+    _sessionSynced = true;
     final session = store.session;
     final lines = session.workout;
     final text = store.allDone
@@ -88,10 +92,12 @@ class LiveStatus {
     final t =
         timers.where((t) => t.running).firstOrNull ?? timers.where((t) => t.elapsed > 0 && !t.finished).firstOrNull;
     if (t == null) {
-      if (_intervalKey != null) platform.cancelNotification(WorkoutNotifications.interval);
+      if (!_intervalSynced || _intervalKey != null) platform.cancelNotification(WorkoutNotifications.interval);
+      _intervalSynced = true;
       _intervalKey = null;
       return;
     }
+    _intervalSynced = true;
     final seg = t.segment;
     final text = t.running
         ? '${seg.label} · ${seg.speed} · ${seg.incline}'

@@ -88,8 +88,12 @@ class MainActivity : FlutterActivity() {
                     if (png == null) {
                         result.error("bad_args", "png is missing", null)
                     } else {
-                        shareImage(png, name)
-                        result.success(null)
+                        try {
+                            shareImage(png, name)
+                            result.success(null)
+                        } catch (e: Exception) {
+                            result.error("share_failed", e.message, null)
+                        }
                     }
                 }
                 "showTimerNotification" -> {
@@ -152,11 +156,16 @@ class MainActivity : FlutterActivity() {
             val resolver = contentResolver
             val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
                 ?: throw IllegalStateException("MediaStore insert failed")
-            resolver.openOutputStream(uri)?.use { it.write(png) }
-                ?: throw IllegalStateException("Cannot write image")
-            values.clear()
-            values.put(MediaStore.Images.Media.IS_PENDING, 0)
-            resolver.update(uri, values, null, null)
+            try {
+                resolver.openOutputStream(uri)?.use { it.write(png) }
+                    ?: throw IllegalStateException("Cannot write image")
+                values.clear()
+                values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                resolver.update(uri, values, null, null)
+            } catch (e: Throwable) {
+                runCatching { resolver.delete(uri, null, null) }
+                throw e
+            }
             return "Pictures/Workout/$name"
         }
         // Android 8-9: no MediaStore RELATIVE_PATH without a storage permission.

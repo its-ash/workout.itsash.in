@@ -50,27 +50,36 @@ class _SessionCompleteSheetState extends State<SessionCompleteSheet> {
     if (_png != null) return _png;
     // Fonts and the card's first paint must be done before capture.
     await WidgetsBinding.instance.endOfFrame;
+    if (!mounted) return null;
     final ro = _boundary.currentContext?.findRenderObject();
     if (ro is! RenderRepaintBoundary) return null;
     final image = await ro.toImage(pixelRatio: 3);
-    final data = await image.toByteData(format: ui.ImageByteFormat.png);
-    image.dispose();
-    return _png = data?.buffer.asUint8List();
+    try {
+      final data = await image.toByteData(format: ui.ImageByteFormat.png);
+      return _png = data?.buffer.asUint8List();
+    } finally {
+      image.dispose();
+    }
   }
 
   /// Save the image, then hand the session to the calendar app.
   Future<void> _export() async {
-    if (_busy) return;
+    if (!mounted || _busy) return;
     setState(() => _busy = true);
     final s = widget.summary;
-    final png = await _render();
     String? saved;
-    if (png != null) saved = await widget.platform.saveImage(png, s.fileName);
+    try {
+      final png = await _render();
+      if (png != null) saved = await widget.platform.saveImage(png, s.fileName);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _savedTo = saved;
+          _busy = false;
+        });
+      }
+    }
     if (!mounted) return;
-    setState(() {
-      _savedTo = saved;
-      _busy = false;
-    });
     final details = [s.calendarDetails, if (saved != null) '\nSummary image: $saved'].join('\n');
     await widget.platform.addToCalendar(
       title: s.calendarTitle,

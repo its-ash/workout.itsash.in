@@ -33,6 +33,7 @@ class SettingsScreen extends StatelessWidget {
                     'The session clock and treadmill timers run from the start time, so closing the app '
                     'does not lose your place. The screen stays on during a session.',
                 icon: Icons.timer_outlined,
+                maxSubtitleLines: 6,
               ),
             ],
           ),
@@ -48,6 +49,7 @@ class SettingsScreen extends StatelessWidget {
                     'Pictures/Workout.',
                 icon: Icons.lock_rounded,
                 iconStatus: UiStatus.success,
+                maxSubtitleLines: 6,
               ),
               if (demos.attribution.isNotEmpty)
                 UiListTile(
